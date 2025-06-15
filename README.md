@@ -1,3 +1,11 @@
+# Introduction
+Ce projet est un site e-commerce pour une marque de mode nommée Maison Dhalia. Initialement créé dans le cadre d’un cours, il a été réalisé par Elena Bao Ngoc Duong, Nadine Dhaouahira, Zack-Harry Aubourg et Joseph Tran-Nguyen.
+
+Le site présente un design dynamique et interactif, avec une base de données de produits. Il comprend également des pages de connexion et d’inscription, un panier, ainsi qu’un système de paiement via l’API Stripe, entre autres fonctionnalités.
+
+⚠️ Important : Ce projet avait été initialement hébergé dans un autre dépôt privé. Toutefois, en raison de l’absence d’autorisations suffisantes, j’ai dû le transférer dans ce dépôt afin de pouvoir le déployer.
+
+
 ## Avant de pouvoir exécuter l'application, vous devez installer Node.js, un logiciel essentiel.
 
 1- Téléchargez et installez **Node.js**:

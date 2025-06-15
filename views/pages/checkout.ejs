@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Checkout</title>
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+    <h1>Checkout page</h1>
+    <button id="checkout-button">Payer maintenant</button>
+
+    <!-- <label for="email">Email:</label>
+    <input type="text" id="email"/>
+    <div id="email-errors" style="color: red"></div>
+
+    <div id="checkout-container"></div> -->
+
+    <script>
+        document.getElementById('checkout-button').addEventListener('click', async () => {
+            const response = await fetch('create-checkout-session', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    couponCode: "FIRST10"
+                })
+            });
+
+            const data = await response.json();
+            if (data.url) {
+                window.location.href = data.url;
+            } else {
+                alert("Erreur lors de la création de la session de paiement.");
+            }
+        });
+
+        /*
+        // 1. Initialiser Stripe
+        const stripe = Stripe(
+            'pk_test_51R70jv4ednZ7Sn44VJoRE9oAJDjYtmWJw2GeQygmKqlxQJLmyh00at2NICDnKeoCA4RrSBzOdqgAoOL5mmkrnYIN00Kw3UHoly',
+            { betas: ['custom_checkout_beta_6'] }
+        );
+
+        // 2. Fonction pour get client secret du backend
+        const fetchClientSecret = () => {
+            return fetch('/create-checkout-session', { method: 'POST' })
+                .then((response) => response.json())
+                .then((json) => json.checkoutSessionClientSecret);
+        };
+
+        // 3. Initialiser checkout
+        stripe.initCheckout({ fetchClientSecret })
+            .then((checkout) => {
+                const checkoutContainer = document.getElementById('checkout-container');
+
+                // 4. Read session info
+                const session = checkout.session();
+
+                // Display line items
+                const lineItems = document.createElement('pre');
+                lineItems.textContent = JSON.stringify(checkout.lineItems, null, 2);
+                checkoutContainer.appendChild(lineItems);
+
+                // Display currency
+                const currency = document.createElement('div');
+                currency.textContent = `Currency: ${session.currency}`;
+                checkoutContainer.appendChild(currency);
+
+                // Display total
+                const total = document.createElement('div');
+                total.textContent = `Total: ${session.total.total.amount}`;
+                checkoutContainer.appendChild(total);
+
+                // Email input
+                const emailInput = document.getElementById('email');
+                const emailErrors = document.getElementById('email-errors');
+
+                emailInput.addEventListener('input', () => {
+                    emailErrors.textContent = '';
+                });
+
+                emailInput.addEventListener('blur', () => {
+                    const newEmail = emailInput.value;
+                    checkout.updateEmail(newEmail).then((result) => {
+                        if (result.error) {
+                            emailErrors.textContent = result.error.message;
+                        }
+                    });
+                });
+            })
+            .catch((error) => {
+                console.error('Stripe checkout init error:', error);
+            }); */
+
+        // console.log('Stripe initialized', stripe);
+    </script>
+</body>
+</html>

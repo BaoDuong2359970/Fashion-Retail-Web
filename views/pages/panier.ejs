@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include("../partials/head.ejs") %>
+<body>
+    <%- include("../partials/header.ejs") %>
+        <main>
+            <h1 class="cart-title">PANIER</h1>
+
+            <div class="cart-container">
+                <% if (produitsPanier.length === 0) { %>
+                    <p style="text-align: center; margin-top: 10%; margin-bottom: 20%;">Votre panier est vide.</p>
+
+                <% } else { %>
+                    <%
+                        const allProduitsPoints = produitsPanier.length > 0 && produitsPanier.every(p => p.isProduitPoint);
+                        const isUserLoggedIn = typeof user !== "undefined" && user != null;
+                    %>
+
+                    <% if (allProduitsPoints) { %>
+                        <div class="alert-pointsonly">
+                            Tous les produits dans votre panier sont des récompenses en points. <br>
+                            Des frais techniques de <strong>0,50$ +taxes</strong> seront appliqués au moment du paiement.
+                        </div>
+                    <% } %>
+
+                    <% if (!isUserLoggedIn) { %>
+                        <div class="alert-connexion">
+                            Vous n'êtes pas connecté. <br>
+                            Vous ne recevrez pas de points de fidelité et vous ne pourrez pas consulter vos commandes ultérieurement sans le lien de confirmation par courriel. <br>
+                            <a href="/connexion" class="alert-connexion-link">
+                                Connectez-vous ici
+                            </a>
+                        </div>
+                    <% } %>
+
+                    <% produitsPanier.forEach(produit => { %>
+                        <div class="cart-item">
+                            <div class="cart-image-placeholder">
+                                <% if (!produit.isProduitPoint) { %>
+                                    <a href="/description/<%= produit.produit_id %>" class="lien-panier">
+                                        <img src="/<%= produit.image %>" alt="<%= produit.nom %>">
+                                    </a>
+                                <% } else { %>
+                                    <img src="/<%= produit.image %>" alt="<%= produit.nom %>">
+                                <% } %>
+                            </div>
+
+                            <div class="cart-details">
+                                <div>
+                                    <% if (!produit.isProduitPoint) { %>
+                                        <a href="/description/<%= produit.produit_id %>" class="lien-panier">
+                                            <p class="produitNomPanier"><strong><%= produit.nom %></strong></p>
+                                            <p class="produitTaillePanier">Taille: <%= produit.taille ? produit.taille : "Unique" %></p>
+                                        </a>
+                                    <% } else { %>
+                                        <p class="produitNomPanier"><strong><%= produit.nom %></strong></p>
+                                        <p class="produitTaillePanier">Taille: <%= produit.taille ? produit.taille : "Unique" %></p>
+                                    <% } %>
+                                    
+                                </div>
+                                <% if (!produit.isProduitPoint) { %>
+                                    <a href="#" class="deplacer-favoris" data-produit-id="<%= produit.produit_id %>" data-taille="<%= produit.taille %>">Déplacer vers favoris</a>
+                                <% } %>
+                            </div>
+
+                            <div class="cart-price-remove">
+                                <div class="cart-price-qtt">
+                                    <p class="cart-price prix-produit-<%= produit.produit_id %>">
+                                        <% if (produit.isProduitPoint) { %>
+                                            <%= produit.prix %> points
+                                        <% } else { %>
+                                            C$<%= produit.sousTotal %>
+                                        <% } %>
+                                    </p>
+
+                                    <div class="quantity-control"
+                                        data-produit-id="<%= produit.produit_id %>"
+                                        data-prix-unitaire="<%= produit.prix %>"
+                                        data-stock-max="<%= produit.stockMax %>"
+                                        data-taille="<%= produit.taille %>"
+                                        data-is-produit-point="<%= produit.isProduitPoint %>">
+                                            <button class="quantite-btn" onclick="updateQuantite(this, -1)">-</button>
+                                            <input type="text" class="quantite-input" value="<%= produit.quantite %>" readonly>
+                                            <button class="quantite-btn" onclick="updateQuantite(this, 1)">+</button>
+                                    </div>
+                                </div>
+
+                                <button class="cart-remove" onclick="retirerProduit(this)" data-produit-id="<%= produit.produit_id %>">Retirer</button>
+                            </div>
+                        </div>
+                    <% }) %>
+
+                    <div class="cart-summary">
+                        <div class="cart-summary-group">
+                            <div class="cart-summary-details">
+                                <p><strong>Total</strong></p>
+                                <p id="total">C$<%= total %></p>
+                            </div>
+
+                            <div class="cart-summary-details">
+                                <p><strong>Total de points</strong></p>
+                                <p id="totalPoints"><%= totalPoints %> points</p>
+                            </div>
+
+                            <div class="cart-summary-details">
+                                <p><strong>Estimation de l'expédition</strong></p>
+                                <p>Calculé au paiement</p>
+                            </div>
+
+                            <div class="cart-summary-details">
+                                <p><strong>TPS (5%)</strong></p>
+                                <p id="tps">C$<%= tps %></p>
+                            </div>
+
+                            <div class="cart-summary-details">
+                                <p><strong>TVQ (9.975%)</strong></p>
+                                <p id="tvq">C$<%= tvq %></p>
+                            </div>
+                        </div>
+                        
+                        <div class="cart-summary-details">
+                            <p><strong>Total de la commande</strong></p>
+                            <p id="total-avec-taxes">C$<%= totalAvecTaxes %></p>
+                        </div>
+                
+                        <div class="cart-buttons">
+                            <button id="checkout-button" class="checkout-btn">Checkout</button>
+
+                            <a href="/">
+                                <button class="cart-button">Continuer à magasiner</button>
+                            </a>
+                        </div>
+                    </div>
+                <% } %>
+        </main>
+
+        <%- include("../partials/footer.ejs") %>
+    <script>
+    // ---------- UPDATE quantité par item ----------
+    function updateQuantite(button, changement) {
+        const qttControl = button.closest('.quantity-control');
+        const input = qttControl.querySelector('.quantite-input');
+
+        let currentValue = parseInt(input.value, 10);
+        if (isNaN(currentValue)) currentValue = 1;
+
+        let newValue = currentValue + changement;
+        const stockMax = parseInt(qttControl.dataset.stockMax);
+        const produitID = qttControl.dataset.produitId;
+        const prixUnitaire = parseFloat(qttControl.dataset.prixUnitaire);
+        const taille = qttControl.dataset.taille;
+        const isProduitPoint = qttControl.dataset.isProduitPoint === "true";
+
+        // Pour pas que c'est 0
+        if (newValue < 1) {
+            newValue = 1;
+        }
+
+        if (newValue > stockMax) {
+            alert(`Stock maximum atteint`);
+            return;
+        }
+
+        input.value = newValue;
+
+        // update sous-total
+        let sousTotal;
+        if (!isProduitPoint) {
+            sousTotal = prixUnitaire * newValue;
+            const sousTotalElement = qttControl.closest('.cart-price-qtt').querySelector('.cart-price');
+            sousTotalElement.textContent = `C$${sousTotal.toFixed(2)}`;
+        }
+
+        recalculerTotaux();
+
+        // envoie AJAX pour mise à jour dans bd
+        fetch('/update-quantite', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id: produitID,
+                quantite: newValue,
+                taille: taille
+            })
+        })
+        .then(res => {
+            if (res.ok) {
+                console.log("Quantite mise a jour avec succes");
+            } else {
+                res.json().then(data => { // Lire le corps de la réponse pour l'erreur
+                    console.error("Erreur pour quantite panier:", data.error);
+                    alert(data.error); // Afficher l'erreur à l'utilisateur
+                    // Réinitialiser l'input à l'ancienne valeur si la mise à jour échoue
+                    input.value = currentValue;
+                    recalculerTotaux(); // Recalculer les totaux pour refléter l'ancienne quantité
+                });
+            }
+        })
+        .catch(error => {
+            console.error("Erreur réseau: ", error);
+            alert("Erreur réseau lors de la mise à jour de la quantité.");
+            // Réinitialiser l'input à l'ancienne valeur en cas d'erreur réseau
+            input.value = currentValue;
+            recalculerTotaux();
+        });
+    }
+
+    // ---------- RECALCULE TOTAUX ----------
+    function recalculerTotaux() {
+        const lignes = document.querySelectorAll('.cart-item');
+        let total = 0;
+        let totalPoints = 0;
+
+        lignes.forEach(item => {
+            const sousTotalEl = item.querySelector('.cart-price');
+            const qttControl = item.querySelector('.quantity-control');
+            const isProduitPoint = qttControl.dataset.isProduitPoint === "true";
+            const quantite = parseInt(qttControl.querySelector('.quantite-input').value) || 1;
+            const prixUnitaire = parseFloat(qttControl.dataset.prixUnitaire) || 0;
+
+            if (!isProduitPoint && sousTotalEl) {
+                total += prixUnitaire * quantite;
+            }
+
+            if (isProduitPoint && sousTotalEl) {
+                totalPoints += prixUnitaire * quantite;
+            }
+        });
+
+        const tps = total * 0.05;
+        const tvq = total * 0.09975;
+        const totalAvecTaxes = total + tps + tvq;
+
+        // Remplacer valeurs
+        document.getElementById('total').textContent = `C$${total.toFixed(2)}`;
+        document.getElementById('totalPoints').textContent = `${totalPoints} points`;
+        document.getElementById('tps').textContent = `C$${tps.toFixed(2)}`;
+        document.getElementById('tvq').textContent = `C$${tvq.toFixed(2)}`;
+        document.getElementById('total-avec-taxes').textContent = `C$${totalAvecTaxes.toFixed(2)}`;
+    }
+
+    // ---------- SUPPRIMER PRODUIT ----------
+    function retirerProduit(button) {
+        const produitID = button.dataset.produitId;
+
+        fetch('/retirer-du-panier', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: produitID })
+        })
+        .then (reponse => {
+            if (reponse.ok) {
+                const panierItem = button.closest('.cart-item');
+                panierItem.remove();
+
+                // Check si panier est vide
+                const restantItems = document.querySelectorAll('.cart-item');
+                if (restantItems.length === 0) {
+                    const container = document.querySelector('.cart-container');
+                    container.innerHTML = `<p style="text-align: center; margin-top: 10%; margin-bottom: 20%;">Votre panier est vide.</p>`;
+                }
+
+                // alert("Un produit a été enlevé du panier");
+
+            } else {
+                console.error('Echec du retrait du produit du panier');
+            }
+        })
+        .catch(error => {
+            console.error('Erreur réseau: ', error);
+        });
+    }
+
+    // ---------- DEPLACEMENT À FAVORIS ----------
+    document.querySelectorAll('.deplacer-favoris').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const produitID = this.dataset.produitId;
+            const taille = this.dataset.taille || "Unique";
+            
+            fetch('/deplacer-vers-favoris', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: produitID, taille })
+            })
+            .then(res => {
+                if(res.ok) {
+                    const item = this.closest('.cart-item');
+                    item.remove();
+
+                    recalculerTotaux();
+
+                    // Check si panier est vide
+                    const restantItems = document.querySelectorAll('.cart-item');
+                    if (restantItems.length === 0) {
+                        const container = document.querySelector('.cart-container');
+                        container.innerHTML = `<p style="text-align: center;">Votre panier est vide.</p>`;
+                    }
+
+                    console.log("Produit déplacé vers favoris du panier");
+                    alert("Un produit a été déplacé vers favoris");
+                } else {
+                    console.error("Erreur lors du déplacement vers favoris");
+                }
+            });
+        });
+    });
+
+    // ----------------------- CHECKOUT BUTTON -----------------------
+    document.getElementById('checkout-button').addEventListener('click', () => {
+        fetch('/create-checkout-session', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.url) {
+                    window.location.href = data.url;
+                    console.log(data.url);
+                } else {
+                    alert("Erreur: URL de session non reçue");
+                }
+            })
+            .catch(err => {
+                console.error('Erreur: ', err);
+                alert("Erreur pendant la redirection vers Stripe");
+        });
+    });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<%- include("../partials/head.ejs") %>
+
+    <body>
+        <%- include("../partials/header.ejs") %>
+
+            <!------------------------------------ CONNEXION ------------------------------------->
+
+            <div class="connexion-contenant">
+                <form id="loginForm" action="/connexion" method="POST">
+                    <h1 class="titre-connexion">CONNEXION</h1>
+
+
+                    <!-- EMAIL -->
+                    <div class="email-box">
+                        <label id="connexionText" for="email">Email</label> <br>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <br>
+
+                    <!-- PASSWORD -->
+                    <div class="password-box">
+                        <label id="connexionText" for="password">Mot de passe</label> <br>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+
+                    <!-- PASSWORD OUBLIÉ -->
+                    <div class="password-oublie">
+                        <div class="checkbox-div">
+                            <input type="checkbox" id="checkboxConnexion">
+                            <label for="checkboxConnexion">Se souvenir de moi</label>
+                        </div>
+        
+                        <a href="/forgot-password" class="password-change">Mot de passe oublié?</a>
+                    </div>
+
+                    <!-- Message d'erreur caché au début -->
+                    <p id="error-message" style="color: red; font-weight: bold; text-align: center; display: none;">
+                        Email ou mot de passe incorrect.
+                    </p>
+                    <br>
+
+                    <!-- BUTTON -->
+                    <button type="submit" id="btnConnexion">Connexion</button>
+
+                    <br>
+
+                    <!-- LIEN POUR INSCRIPTION -->
+                    <a href="/inscription" class="lien-inscription">S'inscrire ici</a>
+                </form>
+            </div>
+
+            <%- include("../partials/footer.ejs") %>
+
+            <script>
+              // Écouteur d'événement pour gérer la soumission du formulaire de connexion
+              document.getElementById("loginForm").addEventListener("submit", async function (event) {
+                event.preventDefault(); // Empêcher le formulaire de se soumettre de manière classique
+            
+                const email = document.getElementById("email").value;
+                const password = document.getElementById("password").value;
+            
+                const response = await fetch("/connexion", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ email, password })
+                });
+            
+                const data = await response.json();
+            
+                // Réinitialiser les styles de bordure
+                document.getElementById("email").style.borderColor = "";
+                document.getElementById("password").style.borderColor = "";
+            
+                // Vérifier si la connexion a échoué
+                if (!data.success) {
+                  document.getElementById("error-message").style.display = "block"; // Afficher le message d'erreur
+                  document.getElementById("error-message").innerText = data.message; // Mettre à jour le message d'erreur
+            
+                  // Appliquer une bordure rouge sur le champ incorrect
+                  if (data.field === "email") {
+                    document.getElementById("email").style.borderColor = "red";
+                  } else if (data.field === "password") {
+                    document.getElementById("password").style.borderColor = "red";
+                  }
+                } else {
+                  window.location.href = "/mon-compte"; // Rediriger vers la page du compte si la connexion est réussie
+                }
+              });
+            
+              // Écouteur d'événement pour charger les informations du localStorage
+              window.addEventListener("DOMContentLoaded", () => {
+                const emailField = document.getElementById("email");
+                const passwordField = document.getElementById("password");
+                const checkbox = document.getElementById("checkboxConnexion");
+            
+                // Charger infos depuis localStorage (s'il y en a)
+                if (localStorage.getItem("remember") === "true") {
+                  emailField.value = localStorage.getItem("email") || "";
+                  passwordField.value = localStorage.getItem("password") || "";
+                  checkbox.checked = true;
+                } else {
+                  checkbox.checked = false; // force décochage si remember !== true
+                }
+            
+                // Réagit au clic sur la case
+                checkbox.addEventListener("change", () => {
+                  if (!checkbox.checked) {
+                    localStorage.removeItem("remember");
+                    localStorage.removeItem("email");
+                    localStorage.removeItem("password");
+                  }
+                });
+              });
+            
+              // Sauvegarde les infos dans le localStorage si case "Se souvenir de moi" est cochée
+              document.getElementById("loginForm").addEventListener("submit", () => {
+                const emailField = document.getElementById("email");
+                const passwordField = document.getElementById("password");
+                const checkbox = document.getElementById("checkboxConnexion");
+            
+                if (checkbox.checked) {
+                  localStorage.setItem("email", emailField.value);
+                  localStorage.setItem("password", passwordField.value);
+                  localStorage.setItem("remember", "true");
+                }
+              });
+            </script>
+            
+              
+              
+    </body>
+
+    
+
+</html>

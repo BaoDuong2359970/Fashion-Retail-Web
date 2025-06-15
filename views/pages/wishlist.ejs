@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include("../partials/head.ejs") %>
+<body>
+    <%- include("../partials/header.ejs") %>
+    <main>
+        <h1 class="wishlist-title">WISHLIST</h1>
+        <div class="wishlist-container">
+ 
+            <% if (produitsWishlist.length === 0) { %>
+                <p style="text-align: center; margin-top: 10%; margin-bottom: 20%;">Votre wishlist est vide.</p>
+            <% } else { %>
+                <% produitsWishlist.forEach(produit => { %>
+                    <div class="wishlist-product">
+                        <div class="wishlist-product-details">
+                            <a href="/description/<%= produit.produit_id %>" class="lien-wishlist">
+                                <img src="<%= produit.image %>" alt="<%= produit.nom %>" style="max-width: 200px;">
+                            </a>
+                            <p class="product-name"><strong><%= produit.nom %></strong></p>
+                            <p class="product-prix">C$<%= produit.prix %></p>
+                            <p class="product-taille">Taille: <%= produit.taille %></p>
+                            <a href="/description/<%= produit.produit_id %>" class="lien-wishlist">
+                                <button type="button" class="details-link">Voire les détails</button>
+                            </a>
+                            <div><button type="button" class="add-cart-btn" onclick="ajouterAuPanier('<%= produit.produit_id %>', '<%= produit.taille %>')">Ajouter au panier</button></div>
+                            <div class="wishlist-remove">
+                                <button class="remove-wishlist" onclick="retirerProduit(this)" data-produit-id="<%= produit.produit_id %>">Retirer</button>
+                            </div>  
+                        </div>
+                    </div>
+                <% }) %>
+            <% } %>
+        </div>
+    </main>
+    
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+ 
+                const descriptionLinks = document.querySelectorAll(".description");
+ 
+                descriptionLinks.forEach(descriptionLink => {
+                    descriptionLink.addEventListener("click", (event) => {
+                        event.preventDefault();
+                        const href = descriptionLink.getAttribute("href");
+                        const productId = href.split('/').pop();
+ 
+                        console.log("Product ID: ", productId);
+                        window.location.href = `/description/${productId}`;
+                    });
+                });
+ 
+            });
+
+    // ---------- SUPPRIMER PRODUIT DE LA WISHLIST ----------
+    function retirerProduit(button) {
+            const produitID = button.dataset.produitId;
+ 
+            fetch('/retirer-de-wishlist', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: produitID })
+            })
+            .then(reponse => {
+                if (reponse.ok) {
+                    const wishlistItem = button.closest('.wishlist-product');
+                    wishlistItem.remove();
+ 
+                    // Check si wishlist est vide
+                    const restantItems = document.querySelectorAll('.wishlist-product');
+                    if (restantItems.length === 0) {
+                        const container = document.querySelector('.wishlist-container');
+                        container.innerHTML = `<p style="text-align: center; margin-top: 10%; margin-bottom: 20%;">Votre wishlist est vide.</p>`;
+                    }
+ 
+                    alert("Un produit a été enlevé de la wishlist");
+ 
+                } else {
+                    console.error('Echec du retrait du produit de la wishlist');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur réseau: ', error);
+            });
+        }
+ 
+   // ------------ ajouter au panier ----------------
+function ajouterAuPanier(produitID) {
+    let taille = null;
+    const tailleBtn = document.querySelector(".buttonJosef.selected");
+   
+    if (tailleBtn) {
+        taille = tailleBtn.name;
+    }
+ 
+   
+    if (!taille) {
+       
+    }
+ 
+    fetch("/ajouter-au-panier", {
+        
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            produit_id: produitID,
+            taille: taille,
+            quantite: 1,
+        })
+        
+    })
+    .then(res => {
+        if (!res.ok) {
+            throw new Error("Erreur lors de l'ajout au panier");
+        }
+        return res.json();
+    })
+    .then(data => {
+        alert("Produit ajouté au panier!");
+        console.log(data);
+    })
+    .catch(err => {
+        console.error("Erreur: ", err);
+        alert("Erreur lors de l'ajout au panier");
+    });
+}
+ 
+ 
+function ajouterAuPanier(produitID, taille) {
+    fetch("/ajouter-au-panier", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            produit_id: produitID,
+            taille: taille,
+            quantite: 1,
+        }),
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert("Produit ajouté au panier!");
+        console.log(data);
+    })
+    .catch(err => console.error("Erreur: ", err));
+}
+       
+</script>
+ 
+        <%- include("../partials/footer.ejs") %>
+   
+</body>
+</html>

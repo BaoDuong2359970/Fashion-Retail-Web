@@ -1,0 +1,8 @@
+mongodb script
+
+-------------- CMD --------------
+docker run --name mongo-site-vetement -d -p 27017:27017 mongodb/mongodb-community-server:latest
+
+cd \.0 App_Trans\Projet_Web\node-mongoDB
+
+npm install

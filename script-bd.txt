@@ -1,0 +1,350 @@
+docker run --name mysql-site_vetement -e MYSQL_ROOT_PASSWORD=oracle -e MYSQL_DATABASE=site_db -p 3306:3306 -d mysql:latest
+
+docker exec -it mysql-site_vetement mysql -u root -p
+
+use site_db
+
+
+-- SQL SCRIPT
+
+-- 1. Table utilisateur (doit être créée en premier)
+CREATE TABLE utilisateur (
+    id_utilisateur INT AUTO_INCREMENT PRIMARY KEY,
+    email          VARCHAR(50) NOT NULL,
+    mot_de_passe   VARCHAR(50) NOT NULL,
+    nom            VARCHAR(50) NOT NULL,
+    prenom         VARCHAR(50) NOT NULL,
+    points	   INT DEFAULT 0
+);
+ 
+-- 2. Table admin
+CREATE TABLE admin (
+    id_admin     INT AUTO_INCREMENT PRIMARY KEY,
+    email        VARCHAR(50) NOT NULL,
+    mot_de_passe VARCHAR(50) NOT NULL
+);
+ 
+-- 3. Table produit
+CREATE TABLE produit (
+    id_produit INT AUTO_INCREMENT PRIMARY KEY,
+    nom        VARCHAR(50) NOT NULL,
+    prix       DECIMAL(10,2) NOT NULL,
+    details    VARCHAR(500) NOT NULL,
+    type       VARCHAR(50) NOT NULL,
+    sous_categorie VARCHAR(50) NOT NULL,
+    genre VARCHAR(50) NOT NULL,
+    tailleXS INT NULL,
+    tailleS INT NULL,
+    tailleM INT NULL,
+    tailleL INT NULL,
+    tailleXL INT NULL,
+    image_url1  VARCHAR(200) NOT NULL,
+    image_url2  VARCHAR(200) NULL,
+    image_url3  VARCHAR(200) NULL,
+    quantite   INT NOT NULL
+);
+ 
+
+-- 4. Table session (référence utilisateur et admin)
+CREATE TABLE session (
+    id_session                 INT AUTO_INCREMENT PRIMARY KEY,
+    date_connexion             DATETIME NOT NULL,
+    utilisateur_id_utilisateur INT NOT NULL,
+    date_expiration            DATETIME NOT NULL,
+    admin_id_admin             INT NOT NULL,
+    FOREIGN KEY (admin_id_admin) REFERENCES admin(id_admin),
+    FOREIGN KEY (utilisateur_id_utilisateur) REFERENCES utilisateur(id_utilisateur)
+);
+
+--5. Table commande
+CREATE TABLE commande (
+    id_commande INT AUTO_INCREMENT PRIMARY KEY,
+    utilisateur_id INT NULL,
+    date_commande DATETIME DEFAULT CURRENT_TIMESTAMP,
+    total DECIMAL(10,2) NOT NULL,
+    stripe_session_id VARCHAR(255),
+    FOREIGN KEY (utilisateur_id) REFERENCES utilisateur(id_utilisateur)
+);
+
+--6. Table commande_produits
+CREATE TABLE commande_produits (
+    id_commande_produit INT AUTO_INCREMENT PRIMARY KEY,
+    id_commande INT NOT NULL,
+    produit_id INT NOT NULL,
+    nom VARCHAR(255) NOT NULL,
+    taille VARCHAR(20),
+    quantite INT NOT NULL,
+    prix_unitaire DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (id_commande) REFERENCES commande(id_commande)
+);
+
+
+
+-- INSERT USERS
+
+INSERT INTO utilisateur (email, mot_de_passe, nom, prenom)
+VALUES 
+('alice.durand@example.com', 'mdp123', 'Durand', 'Alice'),
+('bastien.martin@example.com', 'mdp456', 'Martin', 'Bastien'),
+('charlotte.legrand@example.com', 'mdp789', 'Legrand', 'Charlotte'),
+('david.robert@example.com', 'mdp111', 'Robert', 'David'),
+('emma.bernard@example.com', 'mdp222', 'Bernard', 'Emma'),
+('francois.moreau@example.com', 'mdp333', 'Moreau', 'François'),
+('gabrielle.dubois@example.com', 'mdp444', 'Dubois', 'Gabrielle'),
+('hugo.fournier@example.com', 'mdp555', 'Fournier', 'Hugo'),
+('ines.leclerc@example.com', 'mdp666', 'Leclerc', 'Inès'),
+('julien.lambert@example.com', 'mdp777', 'Lambert', 'Julien'),
+('karine.rousseau@example.com', 'mdp888', 'Rousseau', 'Karine'),
+('laurent.perrin@example.com', 'mdp999', 'Perrin', 'Laurent'),
+('manon.dumont@example.com', 'mdp000', 'Dumont', 'Manon'),
+('nathan.girard@example.com', 'mdp112', 'Girard', 'Nathan'),
+('olivia.morel@example.com', 'mdp223', 'Morel', 'Olivia'),
+('pierre.andre@example.com', 'mdp334', 'André', 'Pierre'),
+('quentin.noel@example.com', 'mdp445', 'Noël', 'Quentin'),
+('romane.dupont@example.com', 'mdp556', 'Dupont', 'Romane'),
+('sebastien.renaud@example.com', 'mdp667', 'Renaud', 'Sébastien'),
+('tiffany.lefevre@example.com', 'mdp778', 'Lefèvre', 'Tiffany'),
+('ugo.duval@example.com', 'mdp889', 'Duval', 'Ugo'),
+('valerie.baron@example.com', 'mdp990', 'Baron', 'Valérie'),
+('william.fernandez@example.com', 'mdp101', 'Fernandez', 'William'),
+('xavier.vidal@example.com', 'mdp202', 'Vidal', 'Xavier'),
+('yasmine.guillaume@example.com', 'mdp303', 'Guillaume', 'Yasmine'),
+('zacharie.masson@example.com', 'mdp404', 'Masson', 'Zacharie'),
+('amelie.meyer@example.com', 'mdp505', 'Meyer', 'Amélie'),
+('benoit.berger@example.com', 'mdp606', 'Berger', 'Benoît'),
+('celia.fontaine@example.com', 'mdp707', 'Fontaine', 'Célia'),
+('damien.roux@example.com', 'mdp808', 'Roux', 'Damien'),
+('elodie.gauthier@example.com', 'mdp909', 'Gauthier', 'Élodie'),
+('florian.blanchard@example.com', 'mdp1111', 'Blanchard', 'Florian'),
+('geraldine.boyer@example.com', 'mdp2222', 'Boyer', 'Géraldine'),
+('henri.roche@example.com', 'mdp3333', 'Roche', 'Henri'),
+('isabelle.legros@example.com', 'mdp4444', 'Legros', 'Isabelle'),
+('jacques.pelletier@example.com', 'mdp5555', 'Pelletier', 'Jacques'),
+('kelly.marchand@example.com', 'mdp6666', 'Marchand', 'Kelly'),
+('leo.martinez@example.com', 'mdp7777', 'Martinez', 'Léo'),
+('mathilde.germain@example.com', 'mdp8888', 'Germain', 'Mathilde'),
+('nicolas.lemaitre@example.com', 'mdp9999', 'Lemaître', 'Nicolas'),
+('oceane.dupuis@example.com', 'mdp0000', 'Dupuis', 'Océane'),
+('paul.deschamps@example.com', 'mdp1122', 'Deschamps', 'Paul'),
+('quentine.vincent@example.com', 'mdp2233', 'Vincent', 'Quentine'),
+('raphael.hubert@example.com', 'mdp3344', 'Hubert', 'Raphaël'),
+('sylvie.bergeron@example.com', 'mdp4455', 'Bergeron', 'Sylvie'),
+('theo.renaud@example.com', 'mdp5566', 'Renaud', 'Théo'),
+('ursula.henry@example.com', 'mdp6677', 'Henry', 'Ursula'),
+('victor.leblanc@example.com', 'mdp7788', 'Leblanc', 'Victor'),
+('willy.renard@example.com', 'mdp8899', 'Renard', 'Willy'),
+('xena.malot@example.com', 'mdp9900', 'Malot', 'Xena');
+
+
+-- INSERT SAC PRODUIT
+
+INSERT INTO produit (nom, prix, details, type, sous_categorie, genre, image_url1, quantite)
+VALUES
+('Pochette noire a anneau', 1400.00, 'Sac a poignee superieure en cuir d\'agneau poli, couleur noire.', 'Sac', 'Pochette', 'Femme', 'Images/Produit-Accessoires/clutch1.jpg', 10),
+ 
+('Pochette noire asymetrique oversize', 1800.00, 'Pochette structuree en cuir d\'agneau verni froisse, couleur noire.', 'Sac', 'Pochette', 'Femme', 'Images/Produit-Accessoires/clutch2.jpg', 5),
+ 
+('Pochette rose pale', 2600.00, 'Pochette en cuir d\'agneau graine, couleur rose.', 'Sac', 'Pochette', 'Femme', 'Images/Produit-Accessoires/clutch3.jpg', 13),
+ 
+('Pochette rouge à imprime croco', 2100.00, 'Pochette en cuir de veau embosse facon crocodile, couleur rouge.', 'Sac', 'Pochette', 'Unisexe', 'Images/Produit-Accessoires/clutch4.jpg', 20),
+ 
+('Pochette palette de peinture multicolore', 890.00, 'Pochette sculpturale en faux cuir graine, couleur noire.', 'Sac', 'Pochette', 'Unisexe', 'Images/Produit-Accessoires/clutch5.jpg', 15);
+
+ 
+INSERT INTO produit (nom, prix, details, type, sous_categorie, genre, image_url1, quantite)
+VALUES
+('Sac bandouliere ergonomique', 750.00, 'Sac bandouliere en cuir de veau embossee facon crocodile, couleur beige.', 'Sac', 'Bandouliere', 'Femme', 'Images/Produit-Accessoires/shoulder1.jpg', 20),
+ 
+('Mini sac bandouliere noir', 450.00, 'Sac bandouliere en cuir poli, couleur noire.', 'Sac', 'Bandouliere', 'Femme', 'Images/Produit-Accessoires/shoulder2.jpg', 40),
+ 
+('Sac bandouliere cargo marron', 500.00, 'Sac bandouliere en cuir graine, couleur marron.', 'Sac', 'Bandouliere', 'Femme', 'Images/Produit-Accessoires/shoulder3.jpg', 30),
+ 
+('Sac bandouliere rose et noire avec breloque', 800.00, 'Sac bandouliere en coton seersucker, couleurs rose et noire, avec breloque.', 'Sac', 'Bandouliere', 'Femme', 'Images/Produit-Accessoires/shoulder4.jpg', 10),
+ 
+('Sac micro brag gris multi-poches', 450.00, 'Sac a poignee superieure en cuir de veau suede lamine, couleur grise.', 'Sac', 'Bandouliere', 'Femme', 'Images/Produit-Accessoires/shoulder5.jpg', 30),
+ 
+('Sac bandouliere plie bordeaux', 650.00, 'Sac a poignee superieure en cuir d\'agneau graine verni, confectionne a la main, couleur bordeaux.', 'Sac', 'Bandouliere', 'Unisexe', 'Images/Produit-Accessoires/shoulder6.jpg', 35),
+ 
+('Grand sac bandouliere croissant marron', 570.00, 'Sac bandouliere en toile de coton enduite, couleur marron.', 'Sac', 'Bandouliere', 'Unisexe', 'Images/Produit-Accessoires/shoulder7.jpg', 20),
+ 
+('Sac bandouliere boucle violet', 890.00, 'Sac bandouliere en suede, couleur violette, avec sangle a boucle.', 'Sac', 'Bandouliere', 'Femme', 'Images/Produit-Accessoires/shoulder8.jpg', 10),
+ 
+('Sac bandouliere en cuir marron', 560.00, 'Sac bandouliere en cuir poli, couleur marron.', 'Sac', 'Bandouliere', 'Femme', 'Images/Produit-Accessoires/shoulder9.jpg', 20),
+ 
+('Sac bandouliere marron a sangle integree', 420.00, 'Sac bandouliere en cuir froisse, couleur marron.', 'Sac', 'Bandouliere', 'Unisexe', 'Images/Produit-Accessoires/shoulder10.jpg', 30);
+ 
+
+INSERT INTO produit (nom, prix, details, type, sous_categorie, genre, image_url1, quantite)
+VALUES
+('Tote noir a boucle de ceinture', 940.00, 'Sac tote en cuir graine, couleur noire. Boucle de ceinture et attache pour cle.', 'Sac', 'Tote', 'Unisexe', 'Images/Produit-Accessoires/tote1.jpg', 40),
+ 
+('Tote en denim bleu avec breloques', 945.00, 'Sac tote en toile de coton, couleur bleue.', 'Sac', 'Tote', 'Unisexe', 'Images/Produit-Accessoires/tote2.jpg', 50),
+ 
+('Tote cargo noir', 650.00, 'Sac tote en cuir de veau froisse et taffetas de nylon, couleur noire.', 'Sac', 'Tote', 'Unisexe', 'Images/Produit-Accessoires/tote3.jpg', 50),
+ 
+('Tote drape en coton noir', 730.00, 'Sac tote en toile de coton, couleur noire.', 'Sac', 'Tote', 'Unisexe', 'Images/Produit-Accessoires/tote4.jpg', 30),
+ 
+('Tote froisse kaki', 600.00, 'Sac tote en cuir verni froisse, couleur kaki.', 'Sac', 'Tote', 'Unisexe', 'Images/Produit-Accessoires/tote5.jpg', 40);
+
+
+-- INSERT ACCESSOIRE PRODUIT
+
+INSERT INTO produit (nom, prix, details, type, sous_categorie, genre, image_url1, quantite)
+VALUES
+('Bracelet triptyque argent', 400.00, 'Bracelet manchette ouvert a plusieurs niveaux en cuivre plaque rhodium.', 'accessoire', 'bracelet', 'unisexe', 'Images/Produit-Accessoires/bracelet1.jpg', 25),
+
+('Bracelet carre dore', 240.00, 'Bracelet manchette en laiton dore pale.', 'accessoire', 'bracelet', 'unisexe', 'Images/Produit-Accessoires/bracelet2.jpg', 20),
+
+('Bracelet Barbara argent avec agate', 650.00, 'Bracelet manchette sculptural fait main en argent sterling et pierre d\'agate du Botswana.', 'accessoire', 'bracelet', 'unisexe', 'Images/Produit-Accessoires/bracelet3.jpg', 15),
+
+('Bracelet a gros maillons argent', 480.00, 'Bracelet en chaine a gros maillons en laiton argente.', 'accessoire', 'bracelet', 'unisexe', 'Images/Produit-Accessoires/bracelet4.jpg', 40),
+
+('Bracelet spirale dore', 350.00, 'Bracelet manchette ouvert en argent sterling plaque or 18 carats.', 'accessoire', 'bracelet', 'unisexe', 'Images/Produit-Accessoires/bracelet5.jpg', 30);
+ 
+
+INSERT INTO produit (nom, prix, details, type, sous_categorie, genre, image_url1, quantite)
+VALUES
+('Casquette Gavroche en denim noir', 250.00, 'Casquette en denim non extensible noir. 100% coton. Fabrique au Canada.', 'accessoire', 'chapeau', 'unisexe', 'Images/Produit-Accessoires/chapeau1.jpg', 30),
+
+('Casquette en denim bleu et beige', 155.00, 'Une casquette en denim extensible bleu et beige. Fabrique au Canada.', 'accessoire', 'chapeau', 'unisexe', 'Images/Produit-Accessoires/chapeau2.jpg', 20),
+
+('Bonnet raye beige et noir', 200.00, 'Bonnet en tricot cotele en melange de coton et viscose, beige et noir. 61% coton, 27% viscose, 12% polyester. Fabrique au Canada.', 'accessoire', 'chapeau', 'unisexe', 'Images/Produit-Accessoires/chapeau3.jpg', 25),
+
+('Cagoule en cachemire noir', 300.00, 'Cagoule en maille brossee 100% cachemire noir. Fabrique au Canada.', 'accessoire', 'chapeau', 'unisexe', 'Images/Produit-Accessoires/chapeau4.jpg', 15),
+
+('Casquette noire delavee avec logo', 100.00, 'Casquette en serge de coton noir. Delavage et effet vieilli partout. 100% coton. Fabrique au Canada.', 'accessoire', 'chapeau', 'unisexe', 'Images/Produit-Accessoires/chapeau5.jpg', 30);
+ 
+
+INSERT INTO produit (nom, prix, details, type, sous_categorie, genre, image_url1, quantite)
+VALUES
+('Ras-de-cou blanc a perles synthetiques et cœur', 500.00, 'Ras-de-cou superpose perles synthetiques blanches, cristaux en verre sur pendentif. Plastique, verre, laiton. Fabrique en Italie.', 'accessoire', 'collier', 'femme', 'Images/Produit-Accessoires/collier1.jpg', 10),
+
+('Collier hibiscus noir', 200.00, 'Collier artisanal en cordon noir. Pendentif graphique en verre texture. Textile, verre borosilicate. Fabrique en Italie.', 'accessoire', 'collier', 'femme', 'Images/Produit-Accessoires/collier2.jpg', 15),
+
+('Collier en or avec perles et diamant', 1500.00, 'Chaine fine en or 14k. Pendentif diamants et perles eau douce. Or. Fabrique aux Etats-Unis.', 'accessoire', 'collier', 'femme', 'Images/Produit-Accessoires/collier3.jpg', 5),
+
+('Collier chaine argent a maillons pointus', 600.00, 'Collier artisanal a maillons textures en argent sterling 925. Fabrique en Italie.', 'accessoire', 'collier', 'unisexe',  'Images/Produit-Accessoires/collier4.jpg', 20),
+
+('Collier double chaine minimaliste en or', 400.00, 'Collier superpose en chaines gourmette fines et epaisses en laiton dore. Fabrique en Italie.', 'accessoire', 'collier', 'unisexe', 'Images/Produit-Accessoires/collier5.jpg', 50);
+ 
+
+INSERT INTO produit (nom, prix, details, type, sous_categorie, genre, image_url1, quantite)
+VALUES
+('Boucles d\'oreilles pendantes de coquillage', 155.00, 'Paire de boucles d\'oreilles pendantes en argent sterling. Fabrique au Canada.', 'accessoire', 'boucles', 'femme', 'Images/Produit-Accessoires/boucles1.jpg', 20),
+
+('Boucles d\'oreilles dorees en forme de nœud', 150.00, 'Paire de boucles d\'oreilles clous en laiton plaque or 14k. Fabrique au Canada.', 'accessoire', 'boucles', 'unisexe', 'Images/Produit-Accessoires/boucles2.jpg', 50),
+
+('Boucles d\'oreilles pendantes a nœud et cristaux', 130.00, 'Paire de boucles d\'oreilles pendantes asymetriques artisanales en laiton plaque palladium. Fabrique en France.', 'accessoire', 'boucles', 'femme', 'Images/Produit-Accessoires/boucles3.jpg', 40),
+
+('Boucles d\'oreilles monogramme dorees', 300.00, 'Paire de boucles d\'oreilles pendantes en metal à ton dore.', 'accessoire', 'boucles', 'unisexe', 'Images/Produit-Accessoires/boucles4.jpg', 20),
+
+('Boucles d\'oreilles fleurs vertes', 330.00, 'Paire de boucles d\'oreilles clous artisanales en vermeil d\'or blanc 18k. Fabrique en Italie.', 'accessoire', 'boucles', 'unisexe', 'Images/Produit-Accessoires/boucles5.jpg', 20);
+
+
+
+
+-- INSERT VETEMENTS FEMMES
+
+INSERT INTO produit (nom, prix, details, type, sous_categorie, genre, tailleXS, tailleS, tailleM, tailleL, tailleXL, image_url1, image_url2, image_url3, quantite) VALUES
+
+('Pantalon droit en jacquard de laine', 1511.00, 'Jacquard de laine rose poudre, Agrafe, bouton et fermeture a glissiere dissimules sur le devant, 100% laine, Nettoyer a sec', 'Bas', '', 'Femme', 5, 5, 5, 5, 5, 'Images/Vetement_femme/Bas_femme/Bas_01A.png', 'Images/Vetement_femme/Bas_femme/bottom_02A.png', 'Images/Vetement_femme/Bas_femme/bottom_03A.png', 15),
+
+('Jupe longue en jean', 1198.00, 'Jean bleu clair, 100% coton', 'Bas', '', 'Femme', 5, 5, 5, 5, 5, 'Images/Vetement_femme/Bas_femme/Bas_01B.png', 'Images/Vetement_femme/Bas_femme/bottom_02B.png', 'Images/Vetement_femme/Bas_femme/bottom_03B.png', 10),
+
+('Jupe mini en denim', 1895.00, 'Denim bleu beige, cuir verni noir, 100% coton; garniture : 100% cuir', 'Bas', '', 'Femme', 5, 5, 5, 5, 5, 'Images/Vetement_femme/Bas_femme/Bas_01C.png', 'Images/Vetement_femme/Bas_femme/Bas_02C.png', 'Images/Vetement_femme/Bas_femme/Bas_03C.png', 10),
+
+('Pantalon cargo taille haute en denim Boucle', 215.00, 'Silhouette de pantalon cargo taille haute', 'Bas', '', 'Femme', 5, 5, 5, 5, 5, 'Images/Vetement_femme/Bas_femme/Bas_01D.png', 'Images/Vetement_femme/Bas_femme/Bas_02D.png', 'Images/Vetement_femme/Bas_femme/Bas_03D.png', 20),
+
+('Pantalon en denim rouge', 6200.00, 'Fermeture a glissiere avec agrafe, Poches avant en biais et poches arriere passepoilees', 'Bas', '', 'Femme', 5, 5, 5, 5, 5, 'Images/Vetement_femme/Bas_femme/Bas_01E.png', 'Images/Vetement_femme/Bas_femme/Bas_02E.png', 'Images/Vetement_femme/Bas_femme/Bas_03E.png', 20),
+
+('Pantalon survetement', 1100.00, '100% coton et elastique au niveau de la taille et des jambes', 'Bas', 'Sportwear', 'Femme', 5, 5, 5, 5, 5, 'Images/Vetement_femme/Bas_femme/Bas_sportwear_01A.png', '', '', 20),
+
+('Legging motif dentelle', 1550.00, '80% polyester, 20% elasthanne Fabrique en Italie', 'Bas', 'Sportwear', 'Femme', 5, 5, 5, 5, 5, 'Images/Vetement_femme/Bas_femme/Bas_sportwear_01B.png', 'Images/Vetement_femme/Bas_femme/Bas_sportwear_02B.png', 'Images/Vetement_femme/Bas_femme/Bas_sportwear_03B.png', 20),
+
+('Short', 140.00, 'Convenant a tous les types de corps', 'Bas', 'Sportwear', 'Femme', 5, 5, 5, 5, 5, 'Images/Vetement_femme/Bas_femme/Bas_sportwear_01C.png', 'Images/Vetement_femme/Bas_femme/Bas_sportwear_02C.png', 'Images/Vetement_femme/Bas_femme/Bas_sportwear_03C.png', 20),
+ 
+------------------------------------------------------------------------------------
+
+('Chandail en denim rouge', 290.99, 'Chandail en denim rouge et ouverture en V sur le devant.', 'Haut', '', 'Femme', 5, 5, 5, 5, 5, 'Images/Vetement_femme/Haut_femme/Haut_01A.png', 'Images/Vetement_femme/Haut_femme/Haut_01B.png', 'Images/Vetement_femme/Haut_femme/Haut_01C.png', 10),
+
+('Chemisier a manches flottantes', 240.99, 'Chemisier a manches flottantes en melange de coton et de viscose tisse aere. Encolure ronde, ouverture goutte d eau a l arriere du cou avec bouton et plis sur la poitrine. Empiecement en dentelle delicate sur le haut et au-dessus de l ourlet.', 'Haut', '', 'Femme', 5, 5, 5, 5, 5, 'Images/Vetement_femme/Haut_femme/Haut_02A.png', 'Images/Vetement_femme/Haut_femme/Haut_02B.png', 'Images/Vetement_femme/Haut_femme/Haut_02C.png', 10),
+
+('Veste Activewear avec SoftMove', 440.99, 'Veste de sport courte et ajustee en tissu fonctionnel fabrique avec SoftMove pour une douceur et un confort ultimes ainsi qu un maintien des contours et DryMove pour evacuer l humidite de la peau. Col montant, fermeture eclair sur le devant avec protege-menton anti-frottements et manches extra-longues avec trous pour les pouces.', 'Haut', 'Sportwear', 'Femme', 5, 5, 5, 5, 5, 'Images/Vetement_femme/Haut_femme/Haut_sportwear_01A.png', 'Images/Vetement_femme/Haut_femme/Haut_sportwear_02A.png', 'Images/Vetement_femme/Haut_femme/Haut_sportwear_03A.png', 10),
+
+('Haut court de sport avec DryMove', 140.99, 'Haut de sport court et ajuste en tissu fonctionnel fabrique avec DryMove pour evacuer l humidite de la peau et vous garder confortablement au sec pendant vos mouvements. Encolure ronde et manches courtes.', 'Haut', 'Sportwear', 'Femme', 5, 5, 5, 5, 5, 'Images/Vetement_femme/Haut_femme/Top_sportwear_01B.png', 'Images/Vetement_femme/Haut_femme/Top_sportwear_02B.PNG', 'Images/Vetement_femme/Haut_femme/Top_sportwear_03B.PNG', 10),
+
+('Soutien-gorge de yoga avec SoftMove', 340.99, 'Soutien-gorge de yoga en tissu fonctionnel fabrique avec SoftMove pour une sensation de seconde peau qui met en valeur votre silhouette naturelle et technologie Lycra Sport pour plus d elasticite. Bretelles larges, col en V, bonnets doubles avec inserts amovibles pour un galbe et un ajustement ajustable, et elastique recouvert sur le bord inferieur avec un interieur doux et brosse. Maintien leger, adapte aux entrainements de faible intensite.', 'Haut', 'Sportwear', 'Femme', 5, 5, 5, 5, 5, 'Images/Vetement_femme/Haut_femme/Top_sportwear_01C.png', 'Images/Vetement_femme/Haut_femme/Top_sportwear_03C.PNG', 'Images/Vetement_femme/Haut_femme/Top_sportwear_02C.PNG', 10),
+
+('Debardeur de sport en DryMove', 220.99, 'Debardeur sans couture avec technologie DryMove pour une evacuation optimale de l humidite.', 'Haut', 'Sportwear', 'Femme', 5, 5, 5, 5, 5, 'Images/Vetement_femme/Haut_femme/Top_sportwear_01D.png', 'Images/Vetement_femme/Haut_femme/Top_sportwear_02D.PNG', 'Images/Vetement_femme/Haut_femme/Haut_sportwear_03D.PNG', 10);
+
+
+INSERT INTO produit (nom, prix, details, type, sous_categorie, genre, tailleXS, tailleS, tailleM, tailleL, tailleXL, image_url1, image_url2, image_url3, quantite) VALUES
+
+('Veste en shearling et cuir bleu minuit', 1045.99, 'Veste ajustee avec epaules prononcees et encolure ronde. Se ferme avec une double fermeture eclair en laiton antique a l'avant et finie avec un detail en relief du logo KNWLS sur l'ourlet.', 'Haut', 'Outerwear', 'Femme', 5, 5, 5, 5, 5, 'Images/Vetement_femme/Haut_femme/Haut_outerwear_01A.png', 'Images/Vetement_femme/Haut_femme/Haut_outerwear_01B.png', 'Images/Vetement_femme/Haut_femme/Haut_outerwear_01C.png', 30),
+
+('Veste en cuir forme V', 1300.99, 'Veste de motard a finition vintage en cuir noir craquele. Detaillee avec un ourlet en forme de corset et deux bandes en cuir suede beige surpiquees descendant des epaules aux poignets.', 'Haut', 'Outerwear', 'Femme', 5, 5, 5, 5, 5, 'Images/Vetement_femme/Haut_femme/Haut_outerwear_02A.png', 'Images/Vetement_femme/Haut_femme/Haut_outerwear_02B.png', 'Images/Vetement_femme/Haut_femme/Haut_outerwear_02C.png', 30),
+
+('Veste en denim courte avec col', 1200.99, 'Veste en denim extensible et ajustee avec une construction a panneaux et un ourlet asymetrique. Fermeture eclair frontale et col large zippable. Manches trois-quarts detaillees avec fermetures eclair aux poignets.', 'Haut', 'Outerwear', 'Femme', 5, 5, 5, 5, 5, 'Images/Vetement_femme/Haut_femme/Haut_outerwear_03A.png', 'Images/Vetement_femme/Haut_femme/Haut_outerwear_03B.png', 'Images/Vetement_femme/Haut_femme/Haut_outerwear_03C.png', 30);
+
+
+
+--INSERT BOTTOM HOMME PRODUIT
+
+INSERT INTO produit (nom, prix, details, type, sous_categorie, genre, tailleXS, tailleS, tailleM, tailleL, tailleXL, image_url1, image_url2, image_url3, quantite)
+VALUES
+    ('Short en jean ', 150.00, 'Short en jean delave gris avec taches de peinture blanches. Coupe ample. Braguette boutonnee. Passants de ceinture. Deux poches avant, deux poches arriere.', 'Bas', '', 'Homme', 5, 5, 5, 5, 5, 'Images/Vetement_homme/Bas_Homme/Bottom_01A.png', 'Images/Vetement_homme/Bas_Homme/Bottom_01B.png', 'Images/Vetement_homme/Bas_Homme/Bottom_01C.png', 30),
+
+    ('Pantalon en jean avec chaines decoratives', 200.00, 'Pantalon en jean delave bleu clair avec chaines decoratives en plastique et metal. Effet use. Coupe ample. Braguette boutonnee. Passants de ceinture. Deux poches avant, deux poches arriere. Details de chaines amovibles.', 'Bas', '', 'Homme', 5, 5, 5, 5, 5, 'Images/Vetement_homme/Bas_Homme/Bottom_02A.png', 'Images/Vetement_homme/Bas_Homme/Bottom_02B.png', 'Images/Vetement_homme/Bas_Homme/Bottom_02C.png', 25),
+
+    ('Pantalon en jean dechire et inscrit', 250.00, 'Pantalon en jean delave bleu clair avec dechirures importantes et inscriptions noires. Coupe tres ample. Braguette boutonnee. Passants de ceinture. Deux poches avant, deux poches arriere. Details d\'usure et d\'inscriptions graphiques.', 'Bas', '', 'Homme', 5, 5, 5, 5, 5, 'Images/Vetement_homme/Bas_Homme/Bottom_03A.png', 'Images/Vetement_homme/Bas_Homme/Bottom_03B.png', 'Images/Vetement_homme/Bas_Homme/Bottom_03C.png', 30),
+
+    ('Pantalon en cuir ', 800.00, 'Pantalon en cuir vert olive avec fermetures eclair laterales. Coupe droite. Taille elastique avec cordon de serrage. Deux poches laterales. Details de fermetures eclair argentees.', 'Bas', '', 'Homme', 5, 5, 5, 5, 5, 'Images/Vetement_homme/Bas_Homme/Bottom_04A.png', 'Images/Vetement_homme/Bas_Homme/Bottom_04B.png', 'Images/Vetement_homme/Bas_Homme/Bottom_04C.png', 25),
+
+    ('Pantalon large en coton ', 350.00, 'Pantalon large en coton noir avec fines rayures ton sur ton. Coupe ample. Fermeture a agrafe et zip. Passants de ceinture. Deux poches laterales, deux poches arriere.', 'Bas', '', 'Homme', 5, 5, 5, 5, 5, 'Images/Vetement_homme/Bas_Homme/Bottom_05A.png', 'Images/Vetement_homme/Bas_Homme/Bottom_05B.png', 'Images/Vetement_homme/Bas_Homme/Bottom_05C.png', 30),
+
+    ('Pantalon de survetement brun', 280.00, 'Pantalon de survetement en coton marron delave. Coupe large. Taille elastique avec cordon de serrage. Deux poches laterales. Finitions brutes.', 'Bas', 'sportwear', 'Homme', 5, 5, 5, 5, 5, 'Images/Vetement_homme/Bas_Homme/Bottom_sportwear_01A.png', 'Images/Vetement_homme/Bas_Homme/Bottom_sportwear_01B.png', 'Images/Vetement_homme/Bas_Homme/Bottom_sportwear_01C.png', 25),
+
+    ('Pantalon de survetement gris', 280.00, 'Pantalon de survetement en coton gris fonce delave. Coupe ample avec chevilles resserrees. Taille elastique avec cordon de serrage. Deux poches laterales. Finitions brutes.', 'Bas', 'Sportwear', 'Homme', 5, 5, 5, 5, 5, 'Images/Vetement_homme/Bas_Homme/Bottom_sportwear_02A.png', 'Images/Vetement_homme/Bas_Homme/Bottom_sportwear_02B.png', 'Images/Vetement_homme/Bas_Homme/Bottom_sportwear_02C.png', 35),
+
+    ('Pantalon empiecements ondules', 420.00, 'Pantalon noir avec empiecements ondules gris et marron. Coupe large. Taille elastique avec cordon de serrage. Deux poches laterales. Detail de cordon de serrage a l\'ourlet.', 'Bas', 'Sportwear', 'Homme', 5, 5, 5, 1, 5, 'Images/Vetement_homme/Bas_Homme/Bottom_sportwear_03A.png', 'Images/Vetement_homme/Bas_Homme/Bottom_sportwear_03B.png', 'Images/Vetement_homme/Bas_Homme/Bottom_sportwear_03C.png', 25),
+
+    ('Pantalon survetement cargo', 750.00, 'Pantalon cargo noir en serge de laine et coton melanges. Coupe large. Taille elastique avec cordon de serrage. Deux poches cargo laterales a rabat. Deux poches laterales. Detail de boutons pression a l\'ourlet.', 'Bas', 'Sportwear', 'Homme', 5, 5, 5, 5, 5, 'Images/Vetement_homme/Bas_Homme/Bottom_sportwear_04A.png', 'Images/Vetement_homme/Bas_Homme/Bottom_sportwear_04B.png', 'Images/Vetement_homme/Bas_Homme/Bottom_sportwear_04C.png', 30),
+
+    ('Pantalon de survetement noir avec design', 550.00, 'Pantalon de survêtement noir en coton avec imprime graphique sur la jambe. Coupe droite. Taille elastique avec cordon de serrage. Deux poches laterales. Finitions cotelees.', 'Bas', 'Sportwear', 'Homme', 5, 5, 5, 5, 5, 'Images/Vetement_homme/Bas_homme/Bottom_sportwear_05A.png', 'Images/Vetement_homme/Bas_homme/Bottom_sportwear_05B.png', 'Images/Vetement_homme/Bas_homme/Bottom_sportwear_05C.png', 25);
+
+
+--INSERT TOP HOMME PRODUIT
+
+INSERT INTO produit (nom, prix, details, type, sous_categorie, genre, tailleXS, tailleS, tailleM, tailleL, tailleXL, image_url1, quantite)
+VALUES
+    ('T-shirt avec trou', 220.00, 'T-shirt gris fonce avec effet delave et trous blancs. Coupe ample. Col rond. Manches courtes. Details d\'usure.', 'Haut', '', 'Homme', 5, 5, 5, 5, 5, 'Images/Vetement_homme/Haut_homme/Top_01A.png', 30),
+
+    ('T-shirt imprime In the Name of Light', 180.00, 'T-shirt noir avec imprime graphique blanc. Coupe ample. Col rond. Manches courtes. Inscription "In the Name of Light".', 'Haut', '', 'Homme', 5, 5, 5, 5, 5, 'Images/Vetement_homme/Haut_homme/Top_02A.png', 25),
+
+    ('Maillot de couleur et manches de longues', 380.00, 'Maillot a manches longues en maille imprimee multicolore. Coupe ample. Col en V. Manches longues avec poignets resserres.', 'Haut', '', 'Homme', 5, 5, 5, 5, 5, 'Images/Vetement_homme/Haut_homme/Top_03A.png', 30),
+
+    ('Haut de rugby', 250.00, 'Haut de rugby gris avec imprime graphique blanc. Col polo blanc. Manches longues avec poignets resserres. Details de bandes noires. Coupe ample.', 'Haut', '', 'Homme', 5, 5, 5, 5, 5, 'Images/Vetement_homme/Haut_homme/Top_04A.png', 30),
+
+    ('Haut manches longues Satoshi Nakamoto', 220.00, 'Haut a manches longues raye multicolore. Imprime "Satoshi Nakamoto" sur le devant. Coupe ample. Col rond. Manches longues. Details de rayures decalees.', 'Haut', '', 'Homme', 5, 5, 5, 5, 5, 'Images/Vetement_homme/Haut_homme/Top_05A.png', 30),
+
+    ('T-shirt en maille', 320.00, 'T-shirt a manches courtes superpose. Maille noire transparente sur t-shirt vert. Coupe ample. Col en V. Details de fermeture eclair.', 'Haut', 'Sportwear', 'Homme', 5, 5, 5, 5, 5, 'Images/Vetement_homme/Haut_homme/Top_sportwear_01A.png', 30),
+
+    ('Haut manches longues Thermal', 110.00, 'Haut a manches longues noir en laine merinos. Fermeture eclair au col. Coupe ajustee. Manches longues avec poignets resserres. Details de coutures plates. Respirant et thermoregulant.', 'Haut', 'Sportwear', 'Homme', 5, 5, 5, 5, 5, 'Images/Vetement_homme/Haut_homme/Top_sportwear_02A.png', 30),
+
+    ('T-shirt Vegyn Nauseous Devlish', 80.00, 'T-shirt noir avec imprime graphique blanc. Inscription "nouscous DEVILISH". Illustration de la faucheuse. Coupe ample. Col rond. Manches courtes.', 'Haut', 'Sportwear', 'Homme', 5, 5, 5, 5, 5, 'Images/Vetement_homme/Haut_homme/Top_sportwear_03A.png', 30),
+
+    ('T-shirt sans manches', 280.00, 'T-shirt noir sans manches en maille. Coupe asymetrique. Details de boutons pression. Col rond. Ourlet fendu.', 'Haut', 'Sportwear', 'Homme', 5, 5, 5, 5, 5, 'Images/Vetement_homme/Haut_homme/Top_sportwear_04A.png', 30),
+
+    ('T-shirt imprime graphique', 350.00, 'T-shirt blanc avec imprime graphique bleu. Chevalier a cheval. Coupe classique. Col rond. Manches courtes. 100% coton.', 'Haut', 'Sportwear', 'Homme', 5, 5, 5, 5, 5, 'Images/Vetement_homme/Haut_homme/Top_sportwear_05A.png', 30);
+
+
+--INSERT OUTWEAR HOMME PRODUIT
+
+INSERT INTO produit (nom, prix, details, type, sous_categorie, genre, tailleXS, tailleS, tailleM, tailleL, tailleXL, image_url1, quantite)
+VALUES
+    ('Manteau brillant a simple boutonnage', 950.00, 'Manteau noir brillant a simple boutonnage. Coupe classique. Revers crantes. Fermeture boutonnee. Deux poches avant a rabat. Doublure interieure. 100% polyurethane.', 'Haut', 'Outerwear', 'Homme', 5, 5, 5, 5, 5, 'Images/Vetement_homme/Haut_homme/Top_outwear_01A.png', 30),
+
+    ('Blouson aviateur a logo brode', 850.00, 'Blouson aviateur vert olive en satin. Logo brode sur la manche. Coupe classique. Fermeture eclair. Col, poignets et ourlet coteles. Deux poches avant a rabat. Doublure interieure. 100% polyester.', 'Haut', 'Outerwear', 'Homme', 5, 5, 5, 5, 5, 'Images/Vetement_homme/Haut_homme/Top_outwear_02A.png', 30),
+
+    ('Veste en cuir craquele bordee de peau lainee', 1500.00, 'Veste noire en cuir craquele avec bordure en peau lainee. Coupe courte. Fermeture eclair. Col montant en peau lainee. Deux poches laterales. Doublure interieure. 100% cuir d\'agneau.', 'Haut', 'Outerwear', 'Homme', 5, 5, 5, 5, 5, 'Images/Vetement_homme/Haut_homme/Top_outwear_03A.png', 30);
+

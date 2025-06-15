@@ -1,0 +1,339 @@
+<!-- SOURCES DES IMAGES
+ - https://www.ssense.com/en-ca
+ - https://www.bewaremag.com/solar-storm-style-apocalypse-par-martin-tremblay/
+ --->
+
+
+<!DOCTYPE html>
+<html lang="en">
+    <%- include("../partials/head.ejs") %>
+    
+<body>
+    <div id="headerContainer">
+        <%- include("../partials/header.ejs") %>
+    </div>
+    <!-- ccc %> -->
+
+    <div class="index-photo">
+        <div class="slideshow-wrapper">
+            <div class="slideshow-track" id="bannerTrack">
+                <div class="slide index-bg" style="background-image: url('../Images/Page-index/background3.jpg');"></div>
+
+                <div class="slide index-bg" style="background-image: url('../Images/Page-index/background1.jpg');"></div>
+                <div class="slide index-bg" style="background-image: url('../Images/Page-index/background2.jpg');"></div>
+                <div class="slide index-bg" style="background-image: url('../Images/Page-index/background3.jpg');"></div>
+
+                <div class="slide index-bg" style="background-image: url('../Images/Page-index/background1.jpg');"></div>
+            </div>
+        </div>
+        
+        <div class="text-overlay" id="maisonDhalia">MAISON DHALIA</div>
+    </div>
+    
+    <!-- ticker animation -->
+     <div class="ticker-wrapper">
+        <div class="ticker" id="ticker">
+            <div class="ticker-content">
+                <span>Visez le luxe. Visez le style.</span>
+                <span>☆</span>
+                <span>Découvrez les nouveautés.</span>
+                <span>☆</span>
+                <span>Gagnez des points fidelité pour chaque dollar dépensé.</span>
+                <span>☆</span>
+                <span>Osez le style, affirmez-vous.</span>
+                <span>☆</span>
+                <span>Qualité supérieure garantie.</span>
+                <span>☆</span>
+                <span>Livraison gratuite pour tous</span>
+                <span>☆</span>
+            </div>
+            <div class="ticker-content">
+                <span>Visez le luxe. Visez le style.</span>
+                <span>☆</span>
+                <span>Découvrez les nouveautés.</span>
+                <span>☆</span>
+                <span>Gagnez des points fidelité pour chaque dollar dépensé.</span>
+                <span>☆</span>
+                <span>Osez le style, affirmez-vous.</span>
+                <span>☆</span>
+                <span>Qualité supérieure garantie.</span>
+                <span>☆</span>
+                <span>Livraison gratuite pour tous</span>
+                <span>☆</span>
+            </div>
+        </div>
+     </div>
+
+    <!------------------------------------ DEUXIEME PAGE DE ACCUEIL ------------------------------------>
+        <div class="index-genre">
+            <div class="shop-homme">
+                <a href="/listProduits/Homme" id="humain" class="shopText">
+                    <p class="shopText">SHOP HOMME</p>
+                    <img src="../Images/Page-index/index-homme.png" alt="Image index Homme" class="index-homme">
+                </a>
+            </div>
+
+            <div class="shop-femme">
+                <a href="/listProduits/Femme" id="humain" class="shopText">
+                    <p class="shopText">SHOP FEMME</p>
+                    <img src="../Images/Page-index/index-femme.png" alt="Image index Femme" class="index-femme">
+                </a>
+            </div>
+        </div>
+        
+    <!------------------------------------ TROISIEME PAGE D'ACCUEIL ------------------------------------>
+
+    <a href="/listProduits/autre">
+        <div class="index-photo-autre">
+            <div class="index-bg-autre"></div> <!--https://www.shockblast.net/solar-storm/-->
+            <div class="text-overlay" id="shopAutre">SHOP AUTRE</div>
+        </div>
+    </a>
+
+    <p class="newTitre">SHOP NOUVEAUTÉS</p>
+    
+    <div class="nouveautes">
+        <div class="div-new">
+            <a href="/listProduits/Haut" class="shopNew">
+                <p>Hauts</p>
+                <img class="imageShopNewHauts" src="../Images/Page-index/shopNewHauts3.jpg">
+            </a>
+        </div>
+
+        <div class="line"></div>
+
+        <div class="div-new">
+            <a href="/listProduits/Bas" class="shopNew">
+                <p>Bas</p>
+                <!-- <img id="skirt-index" class="imageShopNewBas" src="../Images/Page-index/valentino-green-solid-crepe-couture-miniskirt.png"> -->
+                <img id="skirt-index" class="imageShopNewBas" src="../Images/Page-index/shopNewBas2.jpg">
+            </a>
+        </div>
+
+        <div class="line"></div>
+
+        <div class="div-new">
+            <a href="/listProduits/Sac" class="shopNew">
+                <p>Sacs</p>
+                <!-- <img class="imageShopNewSacs" src="../Images/Page-index/margesherwood-black-belted-bag.png"> -->
+                <img class="imageShopNewSacs" src="../Images/Page-index/shopNewSac2.jpg">
+            </a>
+        </div>
+
+        <div class="line"></div>
+
+        <div class="div-new">
+            <a href="/listProduits/accessoire" class="shopNew">
+                <p>Accessoires</p>
+                <img class="imageShopNewAcc" src="../Images/Page-index/shopNewAcc2.jpg">
+            </a>
+        </div>
+    </div>
+
+    <!------------ POP UP FOR FIRST TIME USERS ------------>
+    <div id="popupContainer" class="popup-overlay">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup()" style="color: white;">&times;</span>
+            <img src="../Images/promo.png" alt="10% offer" class="popup-banner">
+
+            <div id="continueShoppingBtn">
+                <button onclick="closePopup()">
+                    Continuer à magasiner
+                </button>
+            </div>
+
+            <p id="newsletterTitle">Abonnez-vous ici :</p>
+
+            <form id="newsletterForm">
+                <input type="email" id="newsletterEmail" style="width: 85%;" name="email" placeholder="Votre courriel" required />
+                <p id="newsletterError" style="display: none; color: red; font-size: 0.9rem;"></p>
+                <button type="submit">S'abonner</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+<script>
+    let lastScrollY = window.scrollY;
+
+    function smoothScrollUpdate() {
+        const scrollY = window.scrollY;
+        
+        if (scrollY !== lastScrollY) {
+            lastScrollY = scrollY;
+
+            const indexPhoto = document.querySelector(".index-photo");
+            const textOverlay = document.getElementById("maisonDhalia");
+
+            if (indexPhoto && textOverlay) {
+                const rect = indexPhoto.getBoundingClientRect();
+                const startOffset = rect.top + window.scrollY;
+                const endOffset = indexPhoto.offsetHeight;
+                const scrollY = window.scrollY
+
+                const progress = Math.min(Math.max((scrollY - startOffset) / endOffset, 0), 1);
+
+                const newTop = 40 + (50 * progress);
+                textOverlay.style.top = `${newTop}%`;
+            }
+
+            // ------------ SHOP AUTRE qui défile ------------
+            const photoAutre = document.querySelector(".index-photo-autre");
+            const shopAutre = document.getElementById("shopAutre");
+
+            if (photoAutre && shopAutre) {
+                const rect = photoAutre.getBoundingClientRect();
+                const photoTop = rect.top + window.scrollY;
+                const photoHeight = photoAutre.offsetHeight;
+
+                const progress = Math.min(Math.max((scrollY - photoTop) / photoHeight, 0), 1);
+
+                const newTop = 40 + (50 * progress);
+                shopAutre.style.top = `${newTop}%`;
+            }
+
+            const bg1 = document.querySelector(".index-bg");
+            if (bg1) {
+                bg1.style.transform = `translateY(${scrollY * 0.3}px)`;
+            }
+
+            const bg2 = document.querySelector(".index-bg-autre");
+            if (bg2) {
+                bg2.style.transform = `translateY(${scrollY * 0.3}px)`;
+            }
+        }
+
+        requestAnimationFrame(smoothScrollUpdate);
+    }
+
+    requestAnimationFrame(smoothScrollUpdate);
+
+
+    document.addEventListener("scroll", function () {
+
+        // ------------ Images qui défile ------------
+        let scrollPosition = window.scrollY;
+
+        // Premier background
+        let bg1 = document.querySelector(".index-bg");
+        if (bg1) {
+            bg1.style.transform = `translateY(${scrollPosition * 0.3}px)`;
+        }
+
+        // Deuxieme background
+        let bg2 = document.querySelector(".index-bg-autre");
+        if (bg2) {
+            bg2.style.transform = `translateY(${scrollPosition * 0.3}px)`;
+        }
+    });
+
+    // image banner
+    const track = document.getElementById('bannerTrack');
+    const slides = document.querySelectorAll('.slide');
+    const totalRealSlides = 3;
+    let currentIndex = 1;
+
+    track.style.transform = `translateX(-${100 * currentIndex}%)`;
+
+    function moveToNextSlide() {
+        currentIndex++;
+        track.style.transition = "transform 1s ease-in-out";
+        track.style.transform = `translateX(-${100 * currentIndex}%)`;
+
+        if (currentIndex === totalRealSlides + 1) {
+            setTimeout(() => {
+                track.style.transition = "none";
+                currentIndex = 1;
+                track.style.transform = `translateX(-${100 * currentIndex}%)`;
+            }, 1000);
+        }
+    }
+
+    setInterval(moveToNextSlide, 5000);
+
+    // ticker hover
+    const ticker = document.getElementById("ticker");
+    let position = 0;
+    let speed = 1;
+    let animationFrame;
+
+    function animateTicker() {
+        position -= speed;
+        if (position <= -ticker.scrollWidth / 2){
+            position = 0;
+        }
+        ticker.style.transform = `translateX(${position}px)`;
+        animationFrame = requestAnimationFrame(animateTicker);
+    }
+
+    animateTicker();
+
+    const wrapper = document.querySelector('.ticker-wrapper');
+    wrapper.addEventListener('mouseenter', () => {
+        speed = 0.5;
+    });
+
+    wrapper.addEventListener('mouseleave', () => {
+        speed = 1;
+    });
+
+    // SECTION POPUP NEWSLETTER PROMO
+    function closePopup(){
+        document.getElementById("popupContainer").style.display = "none";
+        document.getElementById("headerContainer").classList.remove("disable-clicks");
+        sessionStorage.setItem("popupSeen", "true");
+    }
+
+    window.addEventListener("DOMContentLoaded", function () {
+        const alreadySeen = sessionStorage.getItem("popupSeen");
+        if (!alreadySeen) {
+            setTimeout(() => {
+                document.getElementById("popupContainer").style.display = "flex";
+                document.getElementById("headerContainer").classList.add("disable-clicks");
+            }, 2000);
+        }
+
+        document.getElementById("newsletterForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const email = document.getElementById("newsletterEmail").value;
+            const errorBox = document.getElementById("newsletterError");
+
+            try {
+                const response = await fetch("/newsletter", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email })
+                });
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    errorBox.textContent = result.message || "Erreur lors de l'inscription.";
+                    errorBox.style.display = "block";
+                } else {
+                    errorBox.textContent = "";
+                    errorBox.style.display = "none";
+
+                    // change image
+                    document.querySelector(".popup-banner").src = "../Images/promocode.jpg";
+
+                    // enleve text fields
+                    document.getElementById("newsletterTitle").style.display = "none";
+                    document.getElementById("newsletterForm").remove();
+
+                    document.getElementById("continueShoppingBtn").style.display = "block";
+                }
+            } catch (err) {
+                console.error("Erreur:", err);
+                errorBox.textContent = "Erreur de connexion";
+            }
+        });
+    });
+
+    
+</script>
+
+<%- include("../partials/footer.ejs") %>
+
+</html>

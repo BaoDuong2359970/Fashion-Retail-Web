@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="fr">
+<%- include("../partials/head.ejs") %>
+
+    <body>
+        <%- include("../partials/header.ejs") %>
+            <main class="account-container">
+                <h1>Mon compte</h1>
+
+                <div class="account-subcontainer">
+                    <div class="sidebar">
+                        <aside>
+                            <ul>
+                                <div class="menu-items">
+                                    <li><a href="/mon-compte">Détails</a></li>
+                                    <li><a href="/commandes">Commandes</a></li>
+                                    <li><a href="/produits-points">Récompenses</a></li>
+                                    <li><a href="/panier">Panier</a></li>
+                                    <li><a href="/wishlist">Wishlist</a></li>
+                                </div>
+                                
+                                <div class="logout-container">
+                                    <li><a href="/deconnexion" class="logout">Se déconnecter</a></li>
+                                </div>
+                            </ul>
+                        </aside>
+                    </div>
+
+                    <div class="ligne-compte"></div>
+
+                    <div class="recompenses-container">
+                        <h1 style="width: 160%; margin-left: -0.5%;">Récompenses en points de fidelité</h1>
+                        <p style="font-size: 130%;">Points de fidélité: <%= pointsUtilisateur %> points</p>
+    
+                        <hr>
+
+                        <h4>100 - 300 points</h4>
+                        <div class="recompenses-cat">
+                            <div class="produitPointGrid">
+                                <% produits100_300.forEach(product => { %>
+                                    <div class="produitPoint">
+                                        <div class="produitPointImage">
+                                            <img src="/<%= product.image_url %>">
+                                        </div>
+
+                                        <div class="produitPointDescription">
+                                            <p><strong><%= product.nom %></strong></p>
+                                            <p><%= product.points_requis %> points</p>
+                                            <button
+                                                class="btn-add-point" 
+                                                data-points="<%= product.points_requis %>"
+                                                onclick="ajouterAuPanier('<%= product.id_produit %>', true, <%= product.points_requis %>, this)"
+                                                <% if (product.points_requis > pointsUtilisateur) { %>
+                                                    disabled style="background-color: rgb(218, 218, 218); border-color: rgb(218, 218, 218); cursor: not-allowed; color: grey" <% } %>
+                                                >Ajouter
+                                            </button>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        </div>
+
+                        <hr>
+    
+                        <h4>300-400 points</h4>
+                        <div class="recompenses-cat">
+                            <div class="produitPointGrid">
+                                <% produits300_400.forEach(product => { %>
+                                    <div class="produitPoint">
+                                        <div class="produitPointImage">
+                                            <img src="/<%= product.image_url %>">
+                                        </div>
+
+                                        <div class="produitPointDescription">
+                                            <p><strong><%= product.nom %></strong></p>
+                                            <p><%= product.points_requis %> points</p>
+                                            <button
+                                                class="btn-add-point"
+                                                data-points="<%= product.points_requis %>"
+                                                onclick="ajouterAuPanier('<%= product.id_produit %>', true, <%= product.points_requis %>, this)"
+                                                <% if (product.points_requis > pointsUtilisateur) { %>
+                                                    disabled style="background-color: rgb(218, 218, 218); border-color: rgb(218, 218, 218); cursor: not-allowed; color: grey" <% } %>
+                                                >Ajouter
+                                            </button>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        </div>
+    
+                        <hr>
+
+                        <h4>400-600 points</h4>
+                        <div class="recompenses-cat">
+                            <div class="produitPointGrid">
+                                <% produits400_600.forEach(product => { %>
+                                    <div class="produitPoint">
+                                        <div class="produitPointImage">
+                                            <img src="/<%= product.image_url %>">
+                                        </div>
+
+                                        <div class="produitPointDescription">
+                                            <p><strong><%= product.nom %></strong></p>
+                                            <p><%= product.points_requis %> points</p>
+                                            <button
+                                                class="btn-add-point"
+                                                data-points="<%= product.points_requis %>"
+                                                onclick="ajouterAuPanier('<%= product.id_produit %>', true, <%= product.points_requis %>, this)"
+                                                <% if (product.points_requis > pointsUtilisateur) { %>
+                                                    disabled style="background-color: rgb(218, 218, 218); border-color: rgb(218, 218, 218); cursor: not-allowed; color: grey" <% } %>
+                                                >Ajouter
+                                            </button>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        </div>
+
+                        <hr>
+    
+                        <h4>600-900 points</h4>
+                        <div class="recompenses-cat">
+                            <div class="produitPointGrid">
+                                <% produits600_900.forEach(product => { %>
+                                    <div class="produitPoint">
+                                        <div class="produitPointImage">
+                                            <img src="/<%= product.image_url %>">
+                                        </div>
+
+                                        <div class="produitPointDescription">
+                                            <p><strong><%= product.nom %></strong></p>
+                                            <p><%= product.points_requis %> points</p>
+                                            <button
+                                                class="btn-add-point"
+                                                data-points="<%= product.points_requis %>"
+                                                onclick="ajouterAuPanier('<%= product.id_produit %>', true, <%= product.points_requis %>, this)"
+                                                <% if (product.points_requis > pointsUtilisateur) { %>
+                                                    disabled style="background-color: rgb(218, 218, 218); border-color: rgb(218, 218, 218); cursor: not-allowed; color: grey" <% } %>
+                                                >Ajouter
+                                            </button>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+
+<script>
+    let pointsDisponibles = <%= pointsUtilisateur %>; // Points available based on user's account
+</script>
+
+<script>
+    // boutton ajouter au panier
+    function ajouterAuPanier(produitID, isProduitPoint = false, pointsRequis = 0, boutonElement) {
+        // Vérifie si user a assez de points
+        if (isProduitPoint && pointsRequis > pointsDisponibles) {
+            alert("Vous n'avez  pas assez de points!");
+            return;
+        }
+
+        fetch("/ajouter-au-panier", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                produit_id: produitID,
+                taille: null,
+                quantite: 1,
+                isProduitPoint: isProduitPoint
+            }),
+        })
+            .then(res => res.json())
+            .then(data => {
+
+                if (isProduitPoint) {
+                    pointsDisponibles -= pointsRequis;
+
+                    boutonElement.classList.remove("btn-add-point");
+                    boutonElement.classList.add("btn-added");
+
+                    boutonElement.textContent = "Ajouté!";
+                    boutonElement.disabled = true;
+                    boutonElement.style.cursor = "default";
+
+                    verifierBoutonsDisponibles();
+                }
+
+                console.log(data);
+            })
+            .catch(err => console.error("Erreur: ", err));
+    }
+
+    function verifierBoutonsDisponibles() {
+        const boutons = document.querySelectorAll('boutton');
+
+        boutons.forEach(bouton => {
+            if (bouton.classList.contains('btn-added')) {
+                return;
+            }
+
+            const pointsNecessaires = parseInt(bouton.dataset.points);
+
+            if (pointsNecessaires > pointsDisponibles) {
+                bouton.disabled = true;
+                bouton.style.backgroundColor = "rgb(218, 218, 218)";
+                bouton.style.cursor = "not-allowed";
+            } else {
+                bouton.disabled = false;
+                bouton.style.backgroundColor = "white";
+                bouton.style.cursor = "pointer";
+            }
+        });
+    }
+</script>
+
+</main>
+
+    <%- include("../partials/footer.ejs") %>
+</body>
+
+</html>

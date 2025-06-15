@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<%- include("../partials/head.ejs") %>
+
+    <body>
+        <div id="overlay"></div>
+
+        <%- include("../partials/header.ejs") %>
+            <main class="account-container">
+                <h1>Mon compte</h1>
+
+                <div class="account-subcontainer">
+                    <div class="sidebar">
+                        <aside>
+                            <ul>
+                                <div class="menu-items">
+                                    <li><a href="/mon-compte">Détails</a></li>
+                                    <li><a href="/commandes">Commandes</a></li>
+                                    <li><a href="/produits-points">Récompenses</a></li>
+                                    <li><a href="/panier">Panier</a></li>
+                                    <li><a href="/wishlist">Wishlist</a></li>
+                                </div>
+                                
+                                <div class="logout-container">
+                                    <li><a href="/deconnexion" class="logout">Se déconnecter</a></li>
+                                </div>
+                            </ul>
+                        </aside>
+                    </div>
+
+                    <div class="ligne-compte"></div>
+
+                    <div class="commandes-section">
+                        <h1>Mes commandes</h1>
+
+                        <% if (commandes && commandes.length > 0) { %>
+                        <div class="commandes-title">
+                            <p class="commande-title-id" style="font-size: 120%;"><strong>Numéro</strong></p>
+                            <p class="commande-title-date" style="font-size: 120%;"><strong>Date</strong></p>
+                            <p class="commande-title-total" style="font-size: 120%;"><strong>Total</strong></p>
+                            <p class="commande-title-status" style="font-size: 120%;"><strong>Statut</strong></p>
+                        </div>
+
+                        <hr class="hr-top">
+
+                            <% commandes.forEach(function(commande) { %>
+                                <div class="commande-container">
+                                    <p class="commande-id"><%= commande._id %></p>
+                                    <p class="commande-date"><%= new Date(commande.date_commande).toLocaleDateString() %></p>
+                                    <p class="commande-total"><%= commande.total %>$</p>
+                                    <p class="commande-status" id="status-<%= commande._id %>"><%= commande.status %></p>
+                            
+                                    <div class="btn-commandes">
+                                        <a href="/detail-commande/<%= commande._id %>">
+                                            <button class="commande-details">
+                                                Détails
+                                            </button>
+                                        </a>
+
+                                        <button
+                                            class="commande-annuler"
+                                            onclick="confirmAnnulation(this)"
+                                            <% if (commande.status === "Annulee" || commande.status === "Expediee" || commande.status === "Livree") { %> disabled <% } %> >
+                                            Annuler
+                                        </button>
+                                    </div>
+
+                                    <div class="popupCommande">
+                                        <button class="close-popup" onclick="closePopups()">×</button>
+                                        <h3>Êtes-vous sûr de vouloir annuler la commande ?</h3>
+                                        <button class="yesBtn" onclick="confirmCancellation(true)">Oui</button>
+                                        <button class="noBtn" onclick="confirmCancellation(false)">Non</button>
+                                    </div>
+
+                                    <div class="popupReason">
+                                        <button class="close-popup" onclick="closePopups()">×</button>
+                                        <h3>Pourquoi souhaitez-vous annuler cette commande ?</h3>
+                                            <form class="reasonForm">
+                                                <input type="radio" id="reason1" name="reason" value="Produit défectueux">
+                                                <label for="reason1">Produit défectueux</label> <br>
+
+                                                <input type="radio" id="reason3" name="reason" value="Mauvaise taille">
+                                                <label for="reason3">Mauvaise taille</label> <br>
+
+                                                <input type="radio" id="reason2" name="reason" value="Mauvaise qualité">
+                                                <label for="reason2">Mauvaise qualité</label> <br>
+
+                                                <div>
+                                                    <label class="autre-radio">
+                                                    <input type="radio" name="reason" value="Autre">  Autre :
+                                                    </label>
+                                                    <input type="text" class="otherReason" placeholder="Veuillez spécifier">
+                                                </div>
+                                                
+                                                <br>
+
+                                                <button class="submitFormBtn" type="submit">Soumettre</button>
+                                            </form>
+                                    </div>
+                                </div>
+
+                                
+
+                                <hr class="hr-bottom">
+                            <% }); %>
+                        <% } else { %>
+                            <p style="margin-left: 3.5%; margin-top: 10%;">Aucune commande trouvée.</p>
+                        <% } %>
+                    </div>
+                </div>
+            </main>
+
+            <%- include("../partials/footer.ejs") %>
+
+    <script>
+
+        function confirmAnnulation(button) {
+            const container = button.closest('.commande-container');
+            const popup = container.querySelector('.popupCommande');
+            const overlay = document.getElementById('overlay');
+
+            popup.style.display = "block";
+            overlay.style.display = "block";
+
+            const orderId = container.querySelector('.commande-id').innerText;
+            popup.setAttribute('data-order-id', orderId);
+        }
+
+        function confirmCancellation(isConfirmed) {
+            const popupCommande = document.querySelector('.popupCommande[style*="display: block"]');
+            const popupReason = popupCommande.parentElement.querySelector('.popupReason');
+            const overlay = document.getElementById('overlay');
+
+            popupCommande.style.display = "none";
+
+            if (isConfirmed) {
+                popupReason.style.display = "block";
+            }
+            else
+            {
+                overlay.style.display = "none";
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll('.reasonForm').forEach(function(form) {
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    const popup = form.closest('.popupReason');
+                    const popupCommande = popup.previousElementSibling;
+                    const orderId = popupCommande.getAttribute('data-order-id');
+                    const overlay = document.getElementById('overlay');
+
+                    const selectedReason = form.querySelector('input[name="reason"]:checked');
+                    const otherReason = form.querySelector('.otherReason').value;
+
+                    const reason = selectedReason && selectedReason.value === 'Autre' ? otherReason : selectedReason ? selectedReason.value : '';
+
+                    if (reason) {
+                        fetch('/annuler-commande', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ id: orderId, raison: reason })
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                popup.style.display = "none";
+                                overlay.style.display = "none";
+                                location.reload();
+                            }
+                            else
+                            {
+                                alert("Erreur lors de l'annulation");
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Erreur :", error);
+                            alert("Erreur serveur");
+                        });
+                    }
+                    else
+                    {
+                        alert('Veuillez sélectionner une raison.');
+                    }
+                });
+
+                form.querySelectorAll('input[name="reason"]').forEach(function(radio) {
+                    radio.addEventListener('change', function() {
+                        const textarea = form.querySelector('.otherReason');
+                        textarea.style.display = this.value === 'Autre';
+                    });
+                });
+            });
+        });
+
+        function closePopups() {
+            document.querySelectorAll('.popupCommande, .popupReason').forEach(function(popup) {
+                popup.style.display = 'none';
+            });
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const commandeIds = Array.from(document.querySelectorAll(".commande-id")).map(el => el.innerText);
+
+            setInterval(() => {
+                commandeIds.forEach(id => {
+                    fetch(`/api/statut-commande/${id}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const statusEl = document.getElementById(`status-${id}`);
+                        if (statusEl && statusEl.innerText !== data.status) {
+                            statusEl.innerText = data.status;
+                        }
+                    })
+                    .catch (err => {
+                        console.error("Erreur AJAX statut dans commande : ", err);
+                    });
+                });
+            }, 5000);
+        });
+    </script>
+
+    </body>
+</html>

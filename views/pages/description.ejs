@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>MD - Description</title>
+<link rel="icon" href="/Projet_Web/Images/Logo.ico" type="image/x-icon">
+<link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=favorite" />
+<%- include("../partials/head.ejs") %>
+
+    <body>
+        <%- include("../partials/header.ejs") %>
+
+            <div class="containerParentJosef">
+
+                <div class="containerGaucheJosef">
+                    <div class="imgJosef">
+                        <img src="/<%= produit.image_url1 %>" alt="<%= produit.nom %>">
+
+                        <% if (produit.image_url2 && produit.image_url2.trim() !=="" ) { %>
+                            <img src="/<%= produit.image_url2 %>" alt="<%= produit.nom %>">
+                            <% } %>
+
+                                <% if (produit.image_url3 && produit.image_url3.trim() !=="" ) { %>
+                                    <img src="/<%= produit.image_url3 %>" alt="<%= produit.nom %>">
+                                    <% } %>
+
+                    </div>
+                </div>
+
+                <div class="containerDroiteJosef">
+                    <div class="containerDroiteSectionJosef">
+                        <h1 class="text-description-produit">
+                            <%= produit.nom %>
+                        </h1>
+                        <p class="text-description-produit" style="margin-top:-3%;" id="prix">
+                            <%= produit.prix %>$ CAD
+                        </p>
+                    </div>
+                    <div class="containerDroiteSectionJosef-sub" id="tailleContainer">
+                        <p style="font-size: 20px;" id="tailleTitre">Tailles</p>
+                        <button class="buttonJosef" onclick="selectSize(this)" name="XS"
+                            style="margin-left: -0.3%;">XS</button>
+                        <button class="buttonJosef" onclick="selectSize(this)" name="S">S</button>
+                        <button class="buttonJosef" onclick="selectSize(this)" name="M">M</button>
+                        <button class="buttonJosef" onclick="selectSize(this)" name="L">L</button>
+                        <button class="buttonJosef" onclick="selectSize(this)" name="XL">XL</button>
+                    </div>
+
+                    <div class="containerDroiteSectionJosef-sub">
+                        <div class="containerDroiteSectionJosef2">
+                            <button class="buttonJosef2"
+                                onclick="ajouterAuPanier('<%= produit.id_produit %>', false, this)">Ajouter
+                                au panier</button>
+
+                            <div class="heartParent">
+                                <i class="fa fa-heart heart-icon-1"></i>
+                                <button class="heart-button" onclick="favoriButtonClick('<%= produit.id_produit %>')">
+                                    <i class="fa fa-heart heart-icon-2" id="heart"
+                                        data-wishlist="<%= isInWishlist %>"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="containerDroiteSectionJosef-sub">
+                        <p class="pJosef">
+                            <%= produit.details %>
+                        </p>
+                        <div class="containerDroiteSectionJosef2">
+                            <p class="pJosef">Type:</p>
+                            <p class="pJosef" id="type">
+                                <%= produit.type %>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-------- SECTION REVIEWS--------->
+            <div class="reviews-container">
+                <h2>Avis</h2>
+                <div class="rating-header">
+                    <div class="rating-stars-title">
+                        <% <!-- Calcul de la moyenne des notes -->
+                            let totalNotes = 0;
+                            let averageRating = 0;
+                            if (avis && avis.length > 0) {
+                            totalNotes = avis.reduce((acc, curr) => acc + curr.note, 0);
+                            averageRating = totalNotes / avis.length;
+                            }%>
+                            <div class="star-rating">
+                                <% for(let i=1; i<=5; i++) { %>
+                                    <span class="star-title <%= i <= averageRating ? 'filled' : '' %>">
+                                        <%= i <=averageRating ? '★' : '☆' %>
+                                    </span>
+                                    <% } %>
+                            </div>
+                            <p class="star-counter">
+                                <%= averageRating.toFixed(1) %>
+                            </p>
+                    </div>
+                    <div>
+                        <% if (isUserLoggedIn) { %>
+                            <% if (userHasPurchasedProduct) { %>
+                                <button class="btn-creer-avis" id="writeReviewButton">Écrire un avis</button>
+                                <% } else { %>
+                                    <p></p>
+                                    <% } %>
+                                        <% } else { %>
+                                            <button class="btn-creer-avis"
+                                                onclick="window.location.href='/connexion'">Connectez-vous pour écrire
+                                                un avis</button>
+                                            <% } %>
+                    </div>
+                </div>
+
+                <hr style="margin-top: 5%;">
+
+                <!-- Formulaire d'ajout d'avis -->
+                <div class="review-form" id="reviewFormContainer" style="display: none; margin-top: 10%;">
+                    <h3>Donnez votre avis</h3>
+                    <form id="reviewForm">
+                        <div class="form-group">
+                            <label for="titre">Titre :</label>
+                            <input type="text" id="titre" name="titre" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Note :</label>
+                            <div class="rating-stars">
+                                <% for(let i=1; i<=5; i++) { %>
+                                    <span class="star" data-value="<%= i %>">☆</span>
+                                    <% } %>
+                            </div>
+                            <input type="hidden" id="rating" name="rating" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="comment">Commentaire :</label>
+                            <textarea id="comment" name="comment" rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="submit-review-btn">Envoyer l'avis</button>
+                    </form>
+                </div>
+
+                <!-- Liste des avis -->
+                <div class="reviews-list">
+                    <% if (avis && avis.length) { %>
+                        <% avis.forEach(avis=> { %>
+                            <div class="review-item">
+                                <div class="review-header">
+                                    <span class="review-author">
+                                        <%= avis.auteur %>
+                                    </span>
+                                    <div class="review-rating">
+                                        <% for (let i=0; i < avis.note; i++) { %>
+                                            <span class="star filled">★</span>
+                                            <% } %>
+                                    </div>
+                                </div>
+                                <h4 class="review-title">
+                                    <%= avis.titre %>
+                                </h4>
+
+                                <p class="review-text">
+                                    <%= avis.commentaire %>
+                                </p>
+                                <span class="review-date">
+                                    <%= new Date(avis.date).toLocaleDateString() %>
+                                </span>
+                            </div>
+                            <% }); %>
+                                <% } else { %>
+                                    <p class="no-reviews">Aucun avis pour ce produit. Soyez le premier à donner votre
+                                        avis !</p>
+                                    <% } %>
+                </div>
+            </div>
+
+
+            <script>
+                const heartIcon = document.getElementById("heart");
+                const heartButton = document.querySelector('.heart-button');
+                const wishlistStatus = heartIcon.dataset.wishlist === 'true';
+
+                if (wishlistStatus) {
+                    heartIcon.style.color = 'red';
+                } else {
+                    heartIcon.style.color = 'white';
+                }
+
+                function AfficherTaille() {
+                    const type = document.getElementById("type");
+                    const tailleButtons = document.querySelectorAll(".buttonJosef");
+                    const tailleTextBox = document.getElementById("tailleTitre");
+                    const tailleContainer = document.getElementById("tailleContainer");
+
+                    if (type.textContent.trim() === "accessoire" || type.textContent.trim() === "Sac") {
+                        tailleTextBox.textContent = "Taille unique";
+                        tailleButtons.forEach(button => button.style.display = "none");
+                    } else {
+                        tailleContainer.style.display = "block"; 
+                    }
+                }
+
+                AfficherTaille();
+
+
+                function selectSize(button) {
+                    document.querySelectorAll(".buttonJosef").forEach(btn => btn.classList.remove("selected"));
+                    button.classList.add("selected");
+                }
+
+
+                // bouton de favori toggle code
+                function favoriButtonClick(produitID) {
+                    const heartIcon = document.getElementById("heart");
+                    const wishlistStatus = heartIcon.dataset.wishlist === 'true';
+
+                    if (wishlistStatus) {
+                        fetch('/retirer-de-wishlist', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ id: produitID })
+                        })
+                            .then(response => {
+                                if (response.ok) {
+                                    heartIcon.style.color = 'white';
+                                    heartIcon.dataset.wishlist = 'false';
+                                    alert("Produit retiré de la wishlist.");
+                                } else {
+                                    console.error('Echec du retrait du produit de la wishlist');
+                                    alert("Erreur lors du retrait du produit.");
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Erreur réseau: ', error);
+                                alert("Erreur réseau.");
+                            });
+                    } else {
+                        const tailleBtn = document.querySelector(".buttonJosef.selected");
+                        const taille = tailleBtn ? tailleBtn.name : null;
+                        if (!taille && document.getElementById("type").textContent.trim() !== "accessoire" && document.getElementById("type").textContent.trim() !== "Sac") {
+                            alert("Veuillez sélectionner une taille"); // temp
+                            return;
+                        }
+
+                        fetch("/ajouter-a-wishlist", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                                produit_id: produitID,
+                                taille: taille,
+                                isFavori: true
+                            }),
+                        })
+                            .then(res => {
+                                if (!res.ok) {
+                                    throw new Error("Erreur lors de l'ajout à la wishlist");
+                                }
+                                return res.json();
+                            })
+                            .then(data => {
+                                alert("Produit ajouté à la wishlist!");
+                                heartIcon.style.color = 'red';
+                                heartIcon.dataset.wishlist = 'true';
+                            })
+                            .catch(err => {
+                                console.error("Erreur: ", err);
+                                alert("Erreur lors de l'ajout à la wishlist");
+                            });
+                    }
+                }
+
+
+                // boutton ajouter au panier
+                function ajouterAuPanier(produitID, isProduitPoint = false, boutonElement) {
+                    const tailleBtn = document.querySelector(".buttonJosef.selected");
+                    const taille = tailleBtn ? tailleBtn.name : null;
+                    if (!taille && document.getElementById("type").textContent.trim() !== "accessoire" && document.getElementById("type").textContent.trim() !== "Sac") {
+                        alert("Veuillez sélectionner une taille"); // temp
+                        return;
+                    }
+
+                    fetch("/ajouter-au-panier", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            produit_id: produitID,
+                            taille: taille,
+                            quantite: 1,
+                        }),
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.error) {
+                                alert(data.error); // Afficher l'erreur (ex: "Out of stock pour cette taille")
+                            } else if (data.added) {
+                                boutonElement.classList.remove("buttonJosef2");
+                                boutonElement.classList.add("btn-produit-added");
+                                boutonElement.textContent = "Ajouté au panier!";
+                                boutonElement.disabled = true;
+                                boutonElement.style.cursor = "default";
+                                console.log(data.message); // Peut afficher un message comme "Quantité mise à jour"
+                            }
+                            console.log(data);
+                        })
+                        .catch(err => console.error("Erreur: ", err));
+                }
+
+                // JavaScript pour afficher le formulaire d'avis
+                document.getElementById('writeReviewButton').addEventListener('click', function () {
+                    const reviewFormContainer = document.getElementById('reviewFormContainer');
+                    reviewFormContainer.style.display = reviewFormContainer.style.display === 'none' ? 'block' : 'none';
+                });
+
+
+                // Gestion des étoiles pour l'avis
+                document.querySelectorAll('.star').forEach(star => {
+                    star.addEventListener('click', function () {
+                        const value = parseInt(this.dataset.value);
+                        const stars = document.querySelectorAll('.star');
+                        stars.forEach((s, index) => {
+                            s.classList.toggle('active', index < value);
+                        });
+                        document.getElementById('rating').value = value;
+                    });
+                });
+
+                // Soumission du formulaire d'avis
+                document.getElementById('reviewForm').addEventListener('submit', async function (e) {
+                    e.preventDefault();
+
+                    const formData = {
+                        produitId: '<%= produit.id_produit %>',
+                        titre: this.titre.value,
+                        note: parseInt(this.rating.value),
+                        commentaire: this.comment.value
+                    };
+                    try {
+                        const response = await fetch('/api/avis', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(formData)
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Erreur lors de la soumission');
+                        }
+                        // Recharger les avis
+                        window.location.reload();
+
+                    } catch (err) {
+                        console.error(err);
+                        alert("Une erreur est survenue lors de l'envoi de l'avis");
+                    }
+                });
+
+            </script>
+
+    </body>
+
+    <%- include("../partials/footer.ejs") %>
+
+</html>

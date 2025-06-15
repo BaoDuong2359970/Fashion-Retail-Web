@@ -1,0 +1,61 @@
+A - Chemisier à détails noués				Prix: 290,99$	Description: Chemisier en tissu tissé avec col volanté à liens étroits et ouverture en V sur le devant. Épaules tombantes et manches longues. Smocks élastiqués et petit volant aux poignets et à l'ourlet.
+B - Chemiser à manches flottantes			Prix: 240,99$	Description: Chemisier à manches flottantes en mélange de coton et de viscose tissé aéré. Encolure ronde, ouverture goutte d'eau à l'arrière du cou avec bouton et plis sur la poitrine. Empiècement en dentelle délicate sur le haut et au-dessus de l'ourlet.
+C - Veste Activewear avec SoftMove			Prix: 440,99$	Description: Veste de sport courte et ajustée en tissu fonctionnel fabriqué avec SoftMove™ pour une douceur et un confort ultimes ainsi qu'un maintien des contours et DryMove™ pour évacuer l'humidité de la peau. Col montant, fermeture éclair sur le devant avec protège-menton anti-frottements et manches extra-longues avec trous pour les pouces.
+
+
+Sport:
+A - Veste Activewear avec SoftMove			Prix: 440,99$	Description: Veste de sport courte et ajustée en tissu fonctionnel fabriqué avec SoftMove™ pour une douceur et un confort ultimes ainsi qu'un soutien profilé et DryMove™ pour évacuer l'humidité de la peau. Col montant, fermeture éclair sur le devant avec protège-menton anti-frottements et manches extra-longues avec trous pour les pouces.
+B - Haut court de sport avec DryMove			Prix: 140,99$ 	Description: Haut de sport court et ajusté en tissu fonctionnel fabriqué avec DryMove™ pour évacuer l'humidité de la peau et vous garder confortablement au sec pendant vos mouvements. Encolure ronde et manches courtes.
+C - Soutien-gorge de yoga avec SoftMove			Prix: 340,99$ 	Description: Soutien-gorge de yoga en tissu fonctionnel fabriqué avec SoftMove™ pour une sensation de seconde peau qui met en valeur votre silhouette naturelle et technologie Lycra® Sport pour plus d'élasticité. Bretelles larges, col en V, bonnets doublés avec inserts amovibles pour un galbe et un ajustement ajustable, et élastique recouvert sur le bord inférieur avec un intérieur doux et brossé. Maintien léger, adapté aux entraînements de faible intensité.
+D - Débardeur de sport en DryMove			Prix: 140,99$ 	Description: Débardeur de sport slim fit à dos nageur en tissu fonctionnel DryMove™ pour évacuer l'humidité de la peau et vous garder confortablement au sec pendant vos mouvements. Encolure ronde.
+
+CREATE TABLE produit_vetement(
+    id_produit INT AUTO_INCREMENT PRIMARY KEY,
+    nom        VARCHAR(50) NOT NULL,
+    prix       DECIMAL(10,2) NOT NULL,
+    details    VARCHAR(150) NOT NULL,
+    type       VARCHAR(50) NOT NULL,
+    sous_categorie VARCHAR(50) NOT NULL,
+    genre VARCHAR(50) NOT NULL,
+    taille VARCHAR(50) NULL,
+    image_url1  VARCHAR(200) NOT NULL,
+    image_url2  VARCHAR(200) NOT NULL,
+    image_url3  VARCHAR(200) NOT NULL,
+    quantite   INT NOT NULL
+);
+
+INSERT INTO produit_vetement (nom, prix, details, type, sous_categorie, genre, taille, image_url1, image_url2, image_url3, quantite)
+VALUES
+('Chemisier à détails noués', 290.99, 'Chemisier en tissu tissé avec col volanté à liens étroits et ouverture en V sur le devant.', 'Top', 'Outerwear', 'Femme', '', 'Images\Vetement_femme\top_femme\Bottom_outerwear_01A.PNG','Images\Vetement_femme\top_femme/Bottom_outerwear_02A.PNG','Images\Vetement_femme\top_femme\Bottom_outerwear_03A.PNG', 10);
+
+type: top - bottom
+sous categorie: outerwear - sportwear
+
+
+
+
+
+
+CREATE TABLE produit (
+    id_produit INT AUTO_INCREMENT PRIMARY KEY,
+    nom        VARCHAR(50) NOT NULL,
+    prix       DECIMAL(10,2) NOT NULL,
+    details    VARCHAR(500) NOT NULL,
+    type       VARCHAR(50) NOT NULL,
+    sous_categorie VARCHAR(50) NOT NULL,
+    genre VARCHAR(50) NOT NULL,
+    tailleXS INT NULL,
+    tailleS INT NULL,
+    tailleM INT NULL,
+    tailleL INT NULL,
+    tailleXL INT NULL,
+    image_url1  VARCHAR(200) NOT NULL,
+    image_url2  VARCHAR(200) NULL,
+    image_url3  VARCHAR(200) NULL,
+    quantite   INT NOT NULL
+);
+
+
+
+INSERT INTO produit (nom, prix, details, type, sous_categorie, genre, tailleXS, tailleS, tailleM, tailleL, tailleXL, image_url1, image_url2, image_url3, quantite) VALUES
+('Pantalon droit en jacquard de laine', 1511.00, 'Jacquard de laine rose poudre, Agrafe, bouton et fermeture a glissiere dissimules sur le devant, 100% laine, Nettoyer a sec', 'Bottom', 'Outerwear', 'Femme', 5, 5, 5, 5, 5, 'Images/Vetement_femme/Bottom_femme/Bottom_01A.png', '', '' , 15),

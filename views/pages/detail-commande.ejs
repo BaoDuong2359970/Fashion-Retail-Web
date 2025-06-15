@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include("../partials/head.ejs") %>
+
+    <body>
+        <%- include("../partials/header.ejs") %>
+
+            <div class="body-detail">
+                <h2 class="page-detail">Détail de la commande</h2>
+
+                <h2 style="margin-bottom: 3%; text-decoration: underline;">Facture</h2>
+
+                <div class="div-id-detail">
+                    <p class="id-detail"><strong>Numéro du commande:</strong>
+                        <%= commande._id %>
+                    </p>
+                </div>
+
+                <div class="div-user-detail">
+                    <h3>Informations de livraison</h3>
+                    <p class="username-detail">
+                        <%= commande.nom_complet %>
+                    </p>
+                    <p class="adresse-detail">
+                        <%= commande.adresse.line1 %>,
+                    </p>
+                    <p>
+                        <%= commande.adresse.line2 %>
+                    </p>
+                    <p class="ville-detail">
+                        <%= commande.adresse.city %>, <%= commande.adresse.state %>
+                    </p>
+                    <p>
+                        <%= commande.adresse.postal_code %>
+                    </p>
+                    <p>
+                        <%= commande.adresse.country==='CA' ? 'Canada' : commande.adresse.country==='US' ? 'États-Unis'
+                            : '' %>
+                    </p>
+                    <p class="email-detail">
+                        <%= commande.email %>
+                    </p>
+                </div>
+
+                <div class="div-livraison-detail">
+                    <h3>Mode de livraison</h3>
+                    <p class="livraison-detail">
+                        <%= commande.methode_livraison %>
+                    </p>
+                </div>
+
+                <div class="div-paiement-detail">
+                    <h3>Paiement</h3>
+                    <div class="grid-paiement">
+                        <p class="label-grid-paiement">Numéro</p>
+                        <p class="value-grid-paiement">
+                            <%= commande.paiement.numero %>
+                        </p>
+
+                        <p class="label-grid-paiement">Date d'expiration</p>
+                        <p class="value-grid-paiement">
+                            <%= commande.paiement.expiration %>
+                        </p>
+
+                        <p class="label-grid-paiement">Type</p>
+                        <p class="value-grid-paiement">
+                            <%= commande.paiement.type %>
+                        </p>
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <% commande.produits.forEach(produit=> { %>
+                    <div class="product-list-commande">
+                        <div class="gauche-commande">
+                            <img src="/<%= produit.image %>" alt="<%= produit.nom %>" />
+                        </div>
+
+                        <div class="droite-commande">
+                            <div class="droite-info">
+                                <div class="nom-taille-commande">
+                                    <p style="font-size: 120%"><strong>
+                                            <%= produit.nom %>
+                                        </strong></p>
+                                    <p><strong>Taille: </strong>
+                                        <%= produit.taille ? produit.taille : "Unique" %>
+                                    </p>
+                                </div>
+                                <div class="qty-total-commande">
+                                    <div>
+                                        <p><strong>Qty: </strong>
+                                            <%= produit.quantite %>
+                                        </p>
+                                        <p><strong>Total: </strong>
+                                            <% if (produit.isProduitPoint) { %>
+                                                <%= produit.prix * produit.quantite %> points
+                                                    <% } else { %>
+                                                        C$<%= (produit.prix * produit.quantite).toFixed(2) %>
+                                        </p>
+                                        <% } %>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+
+                            <div class="prix-produit-commande">
+                                <div>
+                                    <p style="font-size: 120%">
+                                        <strong>
+                                            <% if (produit.isProduitPoint) { %>
+                                                <%= produit.prix %> points
+                                                    <% } else { %>
+                                                        C$<%= produit.prix %>
+                                                            <% } %>
+                                        </strong>
+                                    </p>
+                                </div>
+                                
+
+                                 <!-- Bouton Laisser un avis -->
+                                 <div class="btn-avis-div">
+                                    <a href="/description/<%= produit.produit_id %>#laisser-avis">
+                                        <button class="btn-avis">
+                                            <p>Laisser un avis</p>
+                                        </button>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+
+                    <hr>
+                    <% }) %>
+
+                        <!-- Calculs pour total -->
+                        <% let sousTotal=0; let tousProduitsPoints=true; commande.produits.forEach(p=> {
+                            if (!p.isProduitPoint) {
+                            tousProduitsPoints = false;
+                            sousTotal += p.prix * p.quantite;
+                            }
+                            });
+
+                            if (tousProduitsPoints) {
+                            sousTotal = 0.50;
+                            }
+
+                            let tps = sousTotal * 0.05;
+                            let tvq = sousTotal * 0.09975;
+                            %>
+
+                            <div class="div-prices-detail">
+                                <div class="grid-prices">
+                                    <div class="row">
+                                        <p class="label">Sous-total</p>
+                                        <p class="value">C$<%= sousTotal.toFixed(2) %>
+                                        </p>
+                                    </div>
+
+                                    <div class="row">
+                                        <p class="label">Total de points utilisés</p>
+                                        <p class="value">
+                                            <%= commande.totalPoints %> points
+                                        </p>
+                                    </div>
+
+                                    <div class="row">
+                                        <p class="label">Frais d'expédition</p>
+                                        <p class="value">Gratuit</p>
+                                    </div>
+                                    <div class="row">
+                                        <p class="label">TPS (5%)</p>
+                                        <p class="value">C$<%= tps.toFixed(2) %>
+                                        </p>
+                                    </div>
+                                    <div class="row">
+                                        <p class="label">TVQ (9.975%)</p>
+                                        <p class="value">C$<%= tvq.toFixed(2) %>
+                                        </p>
+                                    </div>
+
+                                    <div class="row total-row">
+                                        <p class="label total-label"><strong>Total de la commande</strong></p>
+                                        <p class="value total-value"><strong>C$<%= commande.total %></strong></p>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="btn-revenir">
+                                <a href="/commandes">
+                                    <button class="btn-revenir-historique">
+                                        Revenir à l'historique des commandes
+                                    </button>
+                                </a>
+                            </div>
+            </div>
+
+            <%- include("../partials/footer.ejs") %>
+    </body>
+
+</html>

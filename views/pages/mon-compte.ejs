@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<%- include("../partials/head.ejs") %>
+
+    <body>
+        <%- include("../partials/header.ejs") %>
+            <main class="account-container">
+                <h1>Mon compte</h1>
+
+                <div class="account-subcontainer">
+                    <div class="sidebar">
+                        <aside>
+                            <ul>
+                                <div class="menu-items">
+                                    <li><a href="#">Détails</a></li>
+                                    <li><a href="/commandes">Commandes</a></li>
+                                    <li><a href="/produits-points">Récompenses</a></li>
+                                    <li><a href="/panier">Panier</a></li>
+                                    <li><a href="/wishlist">Wishlist</a></li>
+                                </div>
+                                
+                                <div class="logout-container">
+                                    <li><a href="/deconnexion" class="logout">Se déconnecter</a></li>
+                                </div>
+                            </ul>
+                        </aside>
+                    </div>
+
+                    <div class="ligne-compte"></div>
+
+                    <div class="account-content">
+                        <div class="account-details">
+                            <h2>
+                                <%= user.prenom %>
+                                    <%= user.nom %>
+                            </h2>
+
+                            <p style="width: 200%;">Points de fidelité: <%= user.points %> points</p>
+
+                            <div class="account-subdetails">
+                                <p><strong>Email:</strong> <%= user.email %>
+                                </p>
+
+                                <p><strong>Mot de passe:</strong> ******</p>
+                            </div>
+
+                            <div class="account-btn">
+                                <a href="/modifier-details"><button class="btn">Modifier les détails</button></a>
+                                <a href="/password-change"><button class="btn">Changer le mot de passe</button></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <%- include("../partials/footer.ejs") %>
+    </body>
+
+</html>

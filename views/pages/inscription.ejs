@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<%- include("../partials/head.ejs") %>
+
+    <body>
+        <%- include("../partials/header.ejs") %>
+
+            <!-- CONNEXION -->
+            <div class="connexion-contenant">
+                <form action="/inscription" method="POST">
+                            <h1 id="inscription-title">INSCRIPTION</h1>
+
+                            <% if (typeof erreur !=='undefined' ) { %>
+                                <div style="color: red; font-size: 17px; margin-top: 20px; margin-bottom: 20px; text-align: center;">
+                                    <%= erreur %>
+                                </div>
+                            <% } %>
+
+                            <div class="identite-box">
+
+                                <div class="prenom-box">
+                                    <label id="connexionText-i" for="prenom">Prenom</label>
+                                    <input type="text" id="prenom" name="prenom" required>
+                                </div>
+
+                                <div class="nom-box">
+                                    <label id="connexionText-i" for="nom">Nom</label>
+                                    <input type="text" id="nom" name="nom" required>
+                                </div>
+                            </div>
+
+                            <!-- EMAIL -->
+                            <div class="email-box">
+                                <label id="connexionText-i" for="courriel">Email</label>
+                                <input type="email" id="email" name="email" required>
+                                <p id="email-error"
+                                    style="color: red; display: none; font-size: 14px; margin-top: 5px;">
+                                    Email invalide. Veuillez entrer un courriel valide.
+                                </p>
+
+                            </div>
+
+                            <!-- PASSWORD -->
+                            <div class="password-box">
+                                <label id="connexionText-i" for="password">Mot de passe</label>
+                                <input type="password" id="password" name="password" required>
+                            </div>
+
+                            <!-- CONFIRMATION PASSWORD -->
+                            <div class="password-box">
+                                <label id="connexionText-i" for="password">Confirmer mot de passe</label>
+                                <input type="password" id="confirm_password" name="confirm_password" required>
+                                <p id="password-error"
+                                    style="color: red; display: none; font-size: 14px; margin-top: 5px;">
+                                    Les mots de passe ne correspondent pas !
+                                </p>
+                            </div>
+
+                            <div class="politique-box">
+                                <p>En créant un compte, vous acceptez la <a href="/politique-confidentialite"
+                                        target="_blank">politique de confidentialité</a> et les <a href="/conditions"
+                                        target="_blank">modalités</a> de MAISON DHALIA</p>
+
+                                <label for="accept-terms">
+                                    <input type="checkbox" id="accept-terms" required onchange="fonctionCheckBox()">
+                                    J’accepte les <a href="/conditions" target="_blank">MODALITÉS</a> et la <a
+                                        href="/politique-confidentialite" target="_blank">POLITIQUE DE
+                                        CONFIDENTIALITÉ</a> de
+                                    MAISON DHALIA.
+                                </label>
+                            </div>
+
+                            <!-- BUTTON -->
+                            <div class="button-container">
+                                <button type="submit" id="btnInscription" disabled>Créer un compte</button>
+
+                                <a href="/connexion" class="lien-inscription">Connexion ici</a>
+                            </div>
+                </form>
+
+            </div>
+            <%- include("../partials/footer.ejs") %>
+    </body>
+
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Validation
+            var email = document.getElementById("email");
+            var emailError = document.getElementById("email-error");
+            var password = document.getElementById("password");
+            var confirmPassword = document.getElementById("confirm_password");
+            var passwordError = document.getElementById("password-error");
+            var btnInscription = document.getElementById("btnInscription");
+
+            function validatePassword() {
+                if (password.value !== confirmPassword.value) {
+                    passwordError.style.display = "block"; // Affiche l'erreur
+                    btnInscription.disabled = true; // Désactive le bouton
+                } else {
+                    passwordError.style.display = "none"; // Cache l'erreur
+                    btnInscription.disabled = false; // Active le bouton
+                }
+            }
+            function validateEmail() {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email.value)) {
+                    emailError.style.display = "block";
+                    btnInscription.disabled = true;
+                } else {
+                    emailError.style.display = "none";
+                    validateForm();
+                }
+            }
+
+            function validateForm() {
+                if (
+                    password.value === confirmPassword.value &&
+                    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)
+                ) {
+                    btnInscription.disabled = false;
+                }
+            }
+
+            email.addEventListener("input", validateEmail);
+            password.addEventListener("input", validatePassword);
+            confirmPassword.addEventListener("input", validatePassword);
+        });
+    </script>
+
+
+</html>

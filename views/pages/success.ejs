@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include("../partials/head.ejs") %>
+<body>
+    <%- include("../partials/header.ejs") %>
+
+    <div class="div-success">
+        <h2 class="success-title">Votre commande a été passée avec succès !</h2>
+        <h3 class="success-subtitle">Numéro de commande
+            <a href="/detail-commande/<%= orderId %>" style="text-decoration: underline; color: black;">
+                <strong>
+                    #<%= orderId %>
+                </strong>
+            </a>
+        </h3>
+        <h3 class="success-subtitle">Merci d'avoir choisi Maison Dhalia.</h3>
+        <a href="/" class="success-link"><p>Retour à l'accueil</p></a>
+    </div>
+    
+
+    <%- include("../partials/footer.ejs") %>
+</body>
+</html>

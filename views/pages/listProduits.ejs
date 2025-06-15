@@ -1,0 +1,299 @@
+<!-- SOURCES DES IMAGES
+ - https://cherry-fukuoka.com/en/
+ - https://www.ssense.com/en-ca
+ - https://knwls.com/
+ -  -->
+
+
+ <!DOCTYPE html>
+ <html lang="en">
+     <%- include("../partials/head.ejs") %>
+     
+ <body>
+     <%- include("../partials/header.ejs") %>
+   
+         <main>
+             <h1 class="categorieContainer">
+                 <% if (subcategory) { %>
+                    <strong>
+                        <%= subcategory.charAt(0).toUpperCase() + subcategory.slice(1) %>
+                    </strong>
+                 
+                 <% } else if (category) { %>
+                     <% if (category === "autre") { %>
+                         <strong>
+                            AUTRE
+                         </strong>
+                     <% } else { %>
+                        <strong>
+                            <%= category.charAt(0).toUpperCase() + category.slice(1) %>
+                        </strong>
+                     <% } %>
+                 <% } else { %>
+                    <strong>
+                        Tous les produits
+                    </strong>
+                 <% } %>
+             </h1>
+             
+             <div class="containerZack">
+                 <aside class="categoriesZack">
+                     <p style="font-size: 120%; margin-bottom: 2px;"><strong>Filtre par prix</strong></p>
+                     <div class="double-slider">
+                        <div class="labels">
+                            <span id="prix-min-affiche">C$<%= prixMinFiltre || prixMin %></span>
+                            <span id="prix-max-affiche" style="float:right">C$<%= prixMaxFiltre || prixMax %></span>
+                        </div>
+                      
+                        <div class="sliders">
+                            <div class="slider-track">
+                                <div class="progress-bar"></div> 
+                            </div>
+                            <input type="range" id="rangeMin" min="<%= prixMin %>" max="<%= prixMax %>" value="<%= prixMinFiltre || prixMin %>" step="1">
+                            <input type="range" id="rangeMax" min="<%= prixMin %>" max="<%= prixMax %>" value="<%= prixMaxFiltre || prixMax %>" step="1">                             
+                        </div>
+                      
+                        <button onclick="filtrerParPrix()">Appliquer</button>
+                      </div>
+                    
+                     <br>
+                     <h2>Categories</h2>
+                     <ul>
+                         <li><button class="bouttonZack" onclick="showAll()">Voir tout</button></li>
+                         <li><button class="bouttonZack" onclick="filterCategory('Haut')">Hauts</button></li>
+                         <li><button class="bouttonZack" onclick="filterCategory('Bas')">Bas</button></li>
+                         <li><button class="bouttonZack" onclick="filterCategory('Outerwear')">Outerwear</button></li>
+                         <li><button class="bouttonZack" onclick="filterCategory('Sportwear')">Sportswear</button></li>
+ 
+                         <li>
+                             <button class="bouttonZack" onclick="toggleOuNaviguer('accessoiresSub', '/listProduits/accessoire')">Accessoires</button>
+                             <ul id="accessoiresSub" class="subcategories">
+                                 <li><a href="/listProduits/accessoire/bracelet" class="subcategoryElena">Bracelets</a></li>
+                                 <li><a href="/listProduits/accessoire/collier" class="subcategoryElena">Colliers</a></li>
+                                 <li><a href="/listProduits/accessoire/boucles" class="subcategoryElena">Boucles d'oreilles</a></li>
+                                 <li><a href="/listProduits/accessoire/chapeau" class="subcategoryElena">Chapeaux</a></li>
+                             </ul>
+                         </li>
+ 
+                         <li>
+                             <button class="bouttonZack" onclick="toggleOuNaviguer('sacsSub', '/listProduits/Sac')">Sacs</button>
+                             <ul id="sacsSub" class="subcategories">
+                                 <li><a href="/listProduits/Sac/pochette" class="subcategoryElena">Pochettes</a></li>
+                                 <li><a href="/listProduits/Sac/bandouliere" class="subcategoryElena">Bandoulières</a></li>
+                                 <li><a href="/listProduits/Sac/tote" class="subcategoryElena">Totes</a></li>
+                             </ul>
+                         </li>
+                     </ul>
+ 
+                     <br>
+                     <p style="font-size: 120%; margin-bottom: 2px;"><strong>Filtre par taille</strong></p>
+                     <ul class="filtreTaille">
+                         <div class="firstRowTaille">
+                            <li><button class="bouttonTaille <%= taillesFiltre.includes('XS') ? 'selected' : '' %>" onclick="selectSize(this)">XS</button></li>
+                            <li><button class="bouttonTaille <%= taillesFiltre.includes('S') ? 'selected' : '' %>" onclick="selectSize(this)">S</button></li>
+                            <li><button class="bouttonTaille <%= taillesFiltre.includes('M') ? 'selected' : '' %>" onclick="selectSize(this)">M</button></li>
+                        </div>
+                        <div class="secondRowTaille">
+                            <li><button class="bouttonTaille <%= taillesFiltre.includes('L') ? 'selected' : '' %>" onclick="selectSize(this)">L</button></li>
+                            <li><button class="bouttonTaille <%= taillesFiltre.includes('XL') ? 'selected' : '' %>" onclick="selectSize(this)">XL</button></li>
+                         </div>
+                     </ul>
+                 </aside>
+ 
+                 <div class="productZackParent">
+                     <section class="productZack">
+                         <div class="gridZack">
+                            <% if (aucunResultat) { %>
+                                <p class="aucun-produit-message">Aucun produit trouvé pour ce filtre.</p>
+                            <% } else { %>
+                                <% products.forEach(product => { %>
+                                    <div class="productZack2">
+                                        <div class="imageZack"> 
+                                            <img 
+                                                src="/<%= product.image_url1 %>"
+                                                alt="<%= product.nom %>"
+                                                data-id="<%= product.id_produit %>" >
+                                        </div>
+                                        <div class="productNomPrix">
+                                            <p><%= product.nom %></p>
+                                            <p><%= product.prix %>$ CAD</p>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            <% } %>
+                            
+                         </div>
+                     </section>
+                 </div>
+             </div>
+         </main>
+    
+ </body>
+ 
+ <script>
+ 
+ function addFilter(filter) {
+     let currentUrl = window.location.pathname;
+     let pathParts = currentUrl.split("/");
+     let genreCategorie = pathParts[2];
+ 
+     let newUrl = (genreCategorie === "Homme" || genreCategorie === "Femme") ? `/listProduits/${genreCategorie}/${filter}` : `/listProduits/${filter}`;
+ 
+     window.location.href = newUrl;
+ }
+ 
+ function filterCategory(category) {
+     let currentUrl = window.location.pathname;
+     let pathParts = currentUrl.split("/");
+     let genreCategorie = pathParts[2];
+ 
+     if (genreCategorie === category) {
+        return;
+     }
+ 
+     let newUrl = (genreCategorie === "Homme" || genreCategorie === "Femme") ? `/listProduits/${genreCategorie}/${category}` : `/listProduits/${category}`;
+ 
+     window.location.href = newUrl;
+ }
+ 
+ function showAll() {
+     let currentUrl = window.location.pathname;
+     let pathParts = currentUrl.split("/");
+     let genreCategorie = pathParts[2];
+ 
+     let newUrl = (genreCategorie === "Homme" || genreCategorie === "Femme") ? `/listProduits/${genreCategorie}` : `/listProduits`;
+ 
+     window.location.href = newUrl;
+ }
+ 
+ let clickTimer = null;
+ 
+ function toggleOuNaviguer(id, url) {
+     let currentUrl = window.location.pathname;
+     let pathParts = currentUrl.split("/");
+     let genreCategorie = pathParts[2]; // Homme ou Femme
+ 
+     let newUrl = (genreCategorie === "Homme" || genreCategorie === "Femme") ? `/listProduits/${genreCategorie}${url.replace("/listProduits", "")}` : url;
+ 
+     // Double click
+     if (clickTimer){
+         clearTimeout(clickTimer);
+         clickTimer = null;
+         window.location.href = newUrl; // navigue vers page
+     } else {
+         // Un click
+         clickTimer = setTimeout(() =>{
+             toggleElement(id); // appelle fonction toggle
+             clickTimer = null;
+         }, 300); // délai
+     }
+     
+ }
+ 
+ function toggleElement(id) {
+     let element = document.getElementById(id);
+ 
+     let currentDisplay = window.getComputedStyle(element).display;
+ 
+     element.style.display = (currentDisplay === "none") ? "block" : "none";
+ }
+ 
+ function selectSize(button) {
+  button.classList.toggle("selected");
+
+  let selectedSizes = Array.from(document.querySelectorAll(".bouttonTaille.selected")).map(btn => btn.textContent);
+
+  const currentUrl = new URL(window.location.href);
+
+  if (selectedSizes.length > 0) {
+    currentUrl.searchParams.set("tailles", selectedSizes.join(","));
+  } else {
+    currentUrl.searchParams.delete("tailles");
+  }
+
+  window.location.href = currentUrl.toString();
+}
+     
+ 
+ document.addEventListener("DOMContentLoaded", () => {
+     const ImageRedirect = () => {
+         console.log("Test");
+         const imageContainers = document.querySelectorAll(".imageZack");
+ 
+         imageContainers.forEach(container => {
+             container.addEventListener("click", (event) => {
+                 const img = container.querySelector("img");
+                 console.log("img element:", img); // Check if the img element is found
+                 if(img){
+                     const productId = img.getAttribute("data-id");
+                     console.log("Product ID: ", productId); // Check the value of productId
+                     window.location.href = `/description/${productId}`;
+                 } else {
+                     console.log("img element not found in container");
+                 }
+ 
+             });
+         });
+     };
+ 
+     ImageRedirect();
+ });
+
+ document.addEventListener("DOMContentLoaded", () => {
+    const rangeMin = document.getElementById("rangeMin");
+    const rangeMax = document.getElementById("rangeMax");
+    const progressBar = document.querySelector(".progress-bar");
+    const prixMinAffiche = document.getElementById("prix-min-affiche");
+    const prixMaxAffiche = document.getElementById("prix-max-affiche");
+
+    function updateProgressBar() {
+        const min = parseInt(rangeMin.value);
+        const max = parseInt(rangeMax.value);
+        const total = parseInt(rangeMax.max) - parseInt(rangeMin.min);
+
+        const left = ((min - parseInt(rangeMin.min)) / total) * 100;
+        const right = 100 - ((max - parseInt(rangeMin.min)) / total) * 100;
+
+        progressBar.style.left = left + "%";
+        progressBar.style.right = right + "%";
+
+        prixMinAffiche.textContent = `C$${parseFloat(min).toFixed(2)}`;
+        prixMaxAffiche.textContent = `C$${parseFloat(max).toFixed(2)}`;
+    }
+
+    rangeMin.addEventListener("input", () => {
+        if (parseInt(rangeMin.value) > parseInt(rangeMax.value)) {
+            rangeMin.value = rangeMax.value;
+        }
+        updateProgressBar();
+    });
+
+    rangeMax.addEventListener("input", () => {
+        if (parseInt(rangeMax.value) < parseInt(rangeMin.value)) {
+            rangeMax.value = rangeMin.value;
+        }
+        updateProgressBar();
+    });
+
+    // 🔥 Ajoute ça : pour initialiser au démarrage
+    updateProgressBar();
+});
+
+
+function filtrerParPrix() {
+  const min = document.getElementById("rangeMin").value;
+  const max = document.getElementById("rangeMax").value;
+
+  const currentUrl = new URL(window.location.href);
+  currentUrl.searchParams.set("prixMin", min);
+  currentUrl.searchParams.set("prixMax", max);
+
+  window.location.href = currentUrl.toString();
+}
+
+
+ </script>
+ 
+ <%- include("../partials/footer.ejs") %>
+ 
+ </html>

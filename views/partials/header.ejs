@@ -1,0 +1,390 @@
+<!-- HEADER -->
+<header>
+	<div class="top-header">
+	  <div class="top-left">
+		<a href="/" class="lien-logo">
+		  <img src="/Images/Logo.png" alt="Logo MD" width="50px" height="50px" class="logo" />
+		</a>
+  
+		<div class="categories-wrapper">
+			<div class="categories">
+				<a href="#" class="categorie-item" onclick="toggleHeaderSubMenu(event, 'femme')">FEMME</a>
+				<a href="#" class="categorie-item" onclick="toggleHeaderSubMenu(event, 'homme')">HOMME</a>
+				<a href="#" class="categorie-item" onclick="toggleHeaderSubMenu(event, 'sac')">SAC</a>
+				<a href="#" class="categorie-item" onclick="toggleHeaderSubMenu(event, 'accessoire')">ACCESSOIRE</a>
+			</div>
+		  
+			<div id="header-submenu" class="header-submenu">
+				<ul id="submenu-list"></ul>
+			</div>
+		</div>
+	  </div>
+
+	  <a href="/">
+		<div id="header-name">
+		  <p>MAISON DHALIA</p>
+		</div>
+	  </a>
+  
+	  <div class="top-icons">
+		<div class="boiteRecherche barreRecherche-container">
+		  <form action="/recherche" method="GET" id="rechercheForm" class="barreRecherche">
+			<input
+			  type="text"
+			  name="query"
+			  id="rechercheInput"
+			  class="barreRecherche_input"
+			  placeholder="Rechercher..."
+			  autocomplete="off"
+			/>
+			<button type="submit" class="barreRecherche_submit">
+			  <i class="fas fa-search"></i>
+			</button>
+		  </form>
+		  <ul id="suggestions" class="suggestion-liste"></ul>
+		</div>
+  
+		<a href="/connexion" class="user-icon"><i class="fas fa-user"></i></a>
+		<a href="/wishlist" class="heart-icon"><i class="fas fa-heart"></i></a>
+		<a href="/panier" class="cart-icon"><i class="fas fa-shopping-cart"></i></a>
+	  </div>
+	</div>
+
+	<!-------------------------- Header quand écran est petit ------------------------>
+	<div class="responsive-ele">
+		<div class="left-mobile">
+			<div class="hamburger" onclick="toggleMenu()">
+				<i class="fas fa-bars"></i>
+			</div>
+
+			<div class="side-menu" id="sideMenu">
+				<div class="close-arrow" id="menuArrow" onclick="handleMenuArrow()">
+					<i class="fas fa-arrow-left"></i>
+				</div>
+
+				<div class="menu-wrapper">
+					<ul id="mainMenu" class="menu-content active">
+						<li><a href="/" onclick="closeMenuAndNavigate(event, '/')">Accueil</a></li>
+						<li><a href="#" onclick="showFemmeSubMenu(event)">Femme</a></li>
+						<li><a href="#" onclick="showHommeSubMenu(event)">Homme</a></li>
+						<li><a href="#" onclick="showSacSubMenu(event)">Sacs</a></li>
+						<li><a href="#" onclick="showAccSubMenu(event)">Accessoires</a></li>
+					</ul>
+
+					<ul id="femmeSubMenu" class="menu-content">
+						<li><a href="/listProduits/Femme" onclick="closeMenuAndNavigate(event, '/listProduits/Femme')"><strong>Voire tout</strong></a></li>
+						<li><a href="/listProduits/Femme/Haut" onclick="closeMenuAndNavigate(event, '/listProduits/Femme/Haut')">Hauts</a></li>
+						<li><a href="/listProduits/Femme/Bas" onclick="closeMenuAndNavigate(event, '/listProduits/Femme/Bas')">Bas</a></li>
+						<li><a href="/listProduits/Femme/Outerwear" onclick="closeMenuAndNavigate(event, '/listProduits/Femme/Outerwear')">Outerwear</a></li>
+						<li><a href="/listProduits/Femme/Sportwear" onclick="closeMenuAndNavigate(event, '/listProduits/Femme/Sportwear')">Sportswear</a></li>
+					</ul>
+
+					<ul id="hommeSubMenu" class="menu-content">
+						<li><a href="/listProduits/Homme" onclick="closeMenuAndNavigate(event, '/listProduits/Homme')"><strong>Voire tout</strong></a></li>
+						<li><a href="/listProduits/Homme/Haut" onclick="closeMenuAndNavigate(event, '/listProduits/Homme/Haut')">Hauts</a></li>
+						<li><a href="/listProduits/Homme/Bas" onclick="closeMenuAndNavigate(event, '/listProduits/Homme/Bas')">Bas</a></li>
+						<li><a href="/listProduits/Homme/Outerwear" onclick="closeMenuAndNavigate(event, '/listProduits/Homme/Outerwear')">Outerwear</a></li>
+						<li><a href="/listProduits/Homme/Sportwear" onclick="closeMenuAndNavigate(event, '/listProduits/Homme/Sportwear')">Sportswear</a></li>
+					</ul>
+
+					<ul id="sacSubMenu" class="menu-content">
+						<li><a href="/listProduits/Sac" onclick="closeMenuAndNavigate(event, '/listProduits/Sac')"><strong>Voire tout</strong></a></li>
+						<li><a href="/listProduits/Sac/pochette" onclick="closeMenuAndNavigate(event, '/listProduits/Sac/pochette')">Pochettes</a></li>
+						<li><a href="/listProduits/Sac/bandouliere" onclick="closeMenuAndNavigate(event, '/listProduits/Sac/bandouliere')">Bandoulières</a></li>
+						<li><a href="/listProduits/Sac/tote" onclick="closeMenuAndNavigate(event, '/listProduits/Sac/tote')">Totes</a></li>
+					</ul>
+
+					<ul id="accSubMenu" class="menu-content">
+						<li><a href="/listProduits/accessoire" onclick="closeMenuAndNavigate(event, '/listProduits/accessoire')"><strong>Voire tout</strong></a></li>
+						<li><a href="/listProduits/accessoire/bracelet" onclick="closeMenuAndNavigate(event, '/listProduits/accessoire/bracelet')">Bracelets</a></li>
+						<li><a href="/listProduits/accessoire/collier" onclick="closeMenuAndNavigate(event, '/listProduits/accessoire/collier')">Colliers</a></li>
+						<li><a href="/listProduits/accessoire/boucles" onclick="closeMenuAndNavigate(event, '/listProduits/accessoire/boucles')">Boucles d'oreilles</a></li>
+						<li><a href="/listProduits/accessoire/chapeau" onclick="closeMenuAndNavigate(event, '/listProduits/accessoire/chapeau')">Chapeaux</a></li>
+					</ul>
+				</div>
+			</div>
+
+			<div class="boiteRecherche-media">
+				<div class="barreRecherche-media">
+		
+					<div class="input-wrapper"><input type="text" class="barreRecherche_input-media" placeholder="Rechercher..."/></div>
+		
+					<button class="barreRecherche_submit-media">
+						<a href="#" class="search-icon-media"><i class="fas fa-search"></i></a>
+					</button>
+				</div>
+		   </div>
+		</div>
+
+		<a href="/" class="header-name-mobile">
+				<p>MAISON DHALIA</p>
+		</a>
+
+		<div class="right-mobile">
+			<a href="/connexion" class="user-icon-mobile"><i class="fas fa-user"></i></a>
+			<a href="/panier" class="cart-icon-mobile"><i class="fas fa-shopping-cart"></i></a>
+		</div>
+	</div>
+  
+	<script>
+		document.addEventListener("DOMContentLoaded", () => {
+		  const input = document.getElementById("rechercheInput");
+		  const suggestions = document.getElementById("suggestions");
+		
+		  input.addEventListener("input", async () => {
+			const query = input.value.trim();
+		
+			if (query.length < 1) {
+			  suggestions.innerHTML = "";
+			  return;
+			}
+		
+			try {
+			  const res = await fetch(`/api/suggestions?query=${encodeURIComponent(query)}`);
+			  const data = await res.json();
+		
+			  suggestions.innerHTML = "";
+		
+			  if (data.length === 0) {
+				const li = document.createElement("li");
+				li.textContent = "Aucun résultat trouvé";
+				li.style.color = "gray";
+				suggestions.appendChild(li);
+			  } else {
+				data.forEach(item => {
+				  const regex = new RegExp(`(${query})`, "gi");
+				  const label = item.label.replace(regex, "<strong>$1</strong>");
+				  const li = document.createElement("li");
+				  li.innerHTML = `<a href="${item.url}">${label}</a>`;
+				  suggestions.appendChild(li);
+				});
+			  }
+			} catch (err) {
+			  console.error("Erreur suggestions :", err);
+			}
+		  });
+		
+		  document.addEventListener("click", (e) => {
+			if (!document.querySelector(".barreRecherche-container").contains(e.target)) {
+			  suggestions.innerHTML = "";
+			}
+		  });
+		});
+
+		// MENU CATEGORIES
+		const subcategories = {
+			femme: [
+				{ label: 'Voir tout', url: '/listProduits/Femme' },
+				{ label: 'Hauts', url: '/listProduits/Femme/Haut' },
+				{ label: 'Bas', url: '/listProduits/Femme/Bas' },
+				{ label: 'Outerwear', url: '/listProduits/Femme/Outerwear' },
+				{ label: 'Sportwear', url: '/listProduits/Femme/Sportwear' }
+			],
+			homme: [
+				{ label: 'Voir tout', url: '/listProduits/Homme' },
+				{ label: 'Hauts', url: '/listProduits/Homme/Haut' },
+				{ label: 'Bas', url: '/listProduits/Homme/Bas' },
+				{ label: 'Outerwear', url: '/listProduits/Homme/Outerwear' },
+				{ label: 'Sportwear', url: '/listProduits/Homme/Sportwear' }
+			],
+			sac: [
+				{ label: 'Voir tout', url: '/listProduits/Sac' },
+				{ label: 'Pochettes', url: '/listProduits/Sac/pochette' },
+				{ label: 'Bandoulières', url: '/listProduits/Sac/bandouliere' },
+				{ label: 'Totes', url: '/listProduits/Sac/tote' }
+			],
+			accessoire: [
+				{ label: 'Voir tout', url: '/listProduits/accessoire' },
+				{ label: 'Bracelets', url: '/listProduits/accessoire/bracelet' },
+				{ label: 'Colliers', url: '/listProduits/accessoire/collier' },
+				{ label: 'Boucles d\'oreilles', url: '/listProduits/accessoire/boucles' },
+				{ label: 'Chapeaux', url: '/listProduits/accessoire/chapeau' }
+			],
+		};
+
+		function toggleHeaderSubMenu(event, categoryKey) {
+			event.preventDefault();
+
+			const submenuContainer = document.getElementById('header-submenu');
+			const submenuList = document.getElementById('submenu-list');
+
+			const alreadyOpen = submenuContainer.classList.contains('open');
+			const currentCategory = submenuList.getAttribute('data-category');
+
+			// Même catégorie clické et ouvert --> ferme
+			if (alreadyOpen && currentCategory === categoryKey) {
+				submenuContainer.classList.remove('open');
+				setTimeout(() => {
+					submenuList.innerHTML = '';
+					submenuList.removeAttribute('data-category');
+				}, 200);
+				return;
+			}
+
+			// Different catégorie clické pendant ouvert --> ferme et reouvre new catégorie
+			if (alreadyOpen && currentCategory !== categoryKey) {
+				submenuContainer.classList.remove('open');
+
+				setTimeout(() => {
+					submenuList.innerHTML = '';
+					submenuList.setAttribute('data-category', categoryKey);
+
+					subcategories[categoryKey].forEach(item => {
+						const li = document.createElement('li');
+						const a = document.createElement('a');
+
+						a.href = item.url;
+						a.textContent = item.label;
+						a.style.fontSize = "17px";
+
+						if (item.label.toLowerCase().includes("voir tout")) {
+							a.style.fontWeight = "bold";
+						}
+
+						li.appendChild(a);
+						submenuList.appendChild(li);
+					});
+
+					submenuContainer.classList.add('open');
+				}, 200);
+
+				return;
+			}
+
+			// Première ouverture
+			submenuList.innerHTML = '';
+			submenuList.setAttribute('data-category', categoryKey);
+
+			subcategories[categoryKey].forEach(item => {
+				const li = document.createElement('li');
+				const a = document.createElement('a');
+
+				a.href = item.url;
+				a.textContent = item.label;
+				a.style.fontSize = "17px";
+
+				if (item.label.toLowerCase().includes("voir tout")) {
+					a.style.fontWeight = "bold";
+				}
+
+				li.appendChild(a);
+				submenuList.appendChild(li);
+			});
+
+			submenuContainer.classList.add('open');
+			
+		}
+
+		document.addEventListener('click', function(e) {
+			const submenu = document.getElementById('header-submenu');
+			const submenuList = document.getElementById('submenu-list');
+
+			if (!submenu.contains(e.target) && !e.target.classList.contains('categorie-item')) {
+				submenu.classList.remove('open');
+				// document.getElementById('submenu-list').innerHTML = '';
+
+				setTimeout(() => {
+					submenuList.innerHTML = '';
+					submenuList.removeAttribute('data-category');
+				}, 300);
+			}
+		});
+
+		// MENU HAMBURGER
+		function toggleMenu() {
+			const menu = document.getElementById('sideMenu');
+			if (menu.style.left === '0px') {
+				menu.style.left = '-250px';
+			} else {
+				menu.style.left = '0px';
+			}
+		}
+
+		function showFemmeSubMenu(event) {
+			event.preventDefault();
+			const main = document.getElementById('mainMenu');
+			const sub = document.getElementById('femmeSubMenu');
+
+			main.classList.add('slide-out');
+			sub.classList.add('active');
+		}
+
+		function showHommeSubMenu(event) {
+			event.preventDefault();
+			const main = document.getElementById('mainMenu');
+			const sub = document.getElementById('hommeSubMenu');
+
+			main.classList.add('slide-out');
+			sub.classList.add('active');
+		}
+
+		function showSacSubMenu(event) {
+			event.preventDefault();
+			const main = document.getElementById('mainMenu');
+			const sub = document.getElementById('sacSubMenu');
+
+			main.classList.add('slide-out');
+			sub.classList.add('active');
+		}
+
+		function showAccSubMenu(event) {
+			event.preventDefault();
+			const main = document.getElementById('mainMenu');
+			const sub = document.getElementById('accSubMenu');
+
+			main.classList.add('slide-out');
+			sub.classList.add('active');
+		}
+
+		function handleMenuArrow() {
+			const main = document.getElementById('mainMenu');
+			const submenus = ['femmeSubMenu', 'hommeSubMenu', 'sacSubMenu', 'accSubMenu'];
+
+			let submenuFound = false;
+
+			submenus.forEach(id => {
+				const submenu = document.getElementById(id);
+				if (submenu.classList.contains('active')) {
+					submenu.classList.remove('active');
+					submenuFound = true;
+				}
+			});
+
+			if (submenuFound) {
+				main.classList.remove('slide-out');
+			} else {
+				toggleMenu();
+			}
+		}
+
+		function goBackMainMenu(event) {
+			event.preventDefault();
+			const main = document.getElementById('mainMenu');
+			const subAcc = document.getElementById('accSubMenu');
+			const subSac = document.getElementById('sacSubMenu');
+
+			main.classList.remove('slide-out');
+			subAcc.classList.remove('active');
+			subSac.classList.remove('active');
+		}
+
+		function closeMenuAndNavigate(event, url) {
+			event.preventDefault();
+			toggleMenu();
+			setTimeout(() => {
+				window.location.href = url;
+			}, 300);
+		}
+
+		document.querySelectorAll('.side-menu a').forEach(link => {
+			link.addEventListener('click', function(e) {
+				if (this.getAttribute('href') !== '#') {
+					document.getElementById('sideMenu').style.left = '-250px';
+					document.getElementById('subcategories-header').style.top = '-250px';
+				}
+			});
+		});
+	</script>
+		
+  </header>
+  

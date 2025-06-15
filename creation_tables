@@ -1,0 +1,63 @@
+ -- 1. Table utilisateur (doit être créée en premier)
+CREATE TABLE utilisateur (
+    id_utilisateur INT AUTO_INCREMENT PRIMARY KEY,
+    email          VARCHAR(50) NOT NULL,
+    mot_de_passe   VARCHAR(100) NOT NULL,
+    nom            VARCHAR(50) NOT NULL,
+    prenom         VARCHAR(50) NOT NULL,
+    points	       INT DEFAULT 0
+);
+ 
+-- 2. Table admin
+CREATE TABLE admin (
+    id_admin     INT AUTO_INCREMENT PRIMARY KEY,
+    email        VARCHAR(50) NOT NULL,
+    mot_de_passe VARCHAR(50) NOT NULL
+);
+ 
+-- 3. Table produit
+CREATE TABLE produit (
+    id_produit INT AUTO_INCREMENT PRIMARY KEY,
+    nom        VARCHAR(50) NOT NULL,
+    prix       DECIMAL(10,2) NOT NULL,
+    details    VARCHAR(500) NOT NULL,
+    type       VARCHAR(50) NOT NULL,
+    sous_categorie VARCHAR(50) NOT NULL,
+    genre VARCHAR(50) NOT NULL,
+    tailleXS INT NULL,
+    tailleS INT NULL,
+    tailleM INT NULL,
+    tailleL INT NULL,
+    tailleXL INT NULL,
+    image_url1  VARCHAR(200) NOT NULL,
+    image_url2  VARCHAR(200) NULL,
+    image_url3  VARCHAR(200) NULL,
+    quantite   INT NOT NULL
+);
+
+-- 4. Table session (référence utilisateur et admin)
+CREATE TABLE session (
+    id_session                 INT AUTO_INCREMENT PRIMARY KEY,
+    date_connexion             DATETIME NOT NULL,
+    utilisateur_id_utilisateur INT NOT NULL,
+    date_expiration            DATETIME NOT NULL,
+    admin_id_admin             INT NOT NULL,
+    FOREIGN KEY (admin_id_admin) REFERENCES admin(id_admin),
+    FOREIGN KEY (utilisateur_id_utilisateur) REFERENCES utilisateur(id_utilisateur)
+);
+
+-- 5. Table produits points (récompenses en points de fidelité)
+CREATE TABLE produits_points (
+    id_produit INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(100) NOT NULL,
+    details VARCHAR(500) NOT NULL,
+    points_requis INT NOT NULL,
+    image_url VARCHAR(200) NOT NULL,
+    quantite INT NOT NULL
+);
+
+-- 6. Table newsletter users
+CREATE TABLE newsletter (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE
+);

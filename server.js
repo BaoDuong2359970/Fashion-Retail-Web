@@ -10,7 +10,7 @@ import path, { parse, resolve } from "path";
 import { fileURLToPath } from "url"; // API payment stripe
 import Stripe from 'stripe';
 import dotenv from 'dotenv';
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from 'uuid';
 import nodemailer from "nodemailer";
 import { check } from "express-validator";

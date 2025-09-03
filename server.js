@@ -10,7 +10,7 @@ import path, { parse, resolve } from "path";
 import { fileURLToPath } from "url"; // API payment stripe
 import Stripe from 'stripe';
 import dotenv from 'dotenv';
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from 'uuid';
 import nodemailer from "nodemailer";
 import { check } from "express-validator";
@@ -34,7 +34,7 @@ const transporter = nodemailer.createTransport({
 
 // import mysql from "mysql2"; 
 // import { body, param, validationResult } from "express-validator"; 
-// import dateFormat from "dateformat"; 
+// import dateFormat from "dateformat";
 
 dotenv.config();
 
@@ -61,7 +61,7 @@ function getRandom(min, max) {
 
 /*Pour la gestion des sessions*/
 app.use(session({
-    secret: "secret-key",
+    secret: process.env.SESSION_SECRET || "secret-key",
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -94,7 +94,7 @@ app.get("/", function (req, res) {
 });
 
 // ------------------------------------------ PAGE LIST PRODUITS ------------------------------------------
-app.get("/listProduits/:category?/:subcategory?", function (req, res) {
+app.get("/listProduits/:category?/:subcategory?", async function (req, res) {
     const category = req.params.category;
     const subcategory = req.params.subcategory;
     const prixMinFiltre = req.query.prixMin || null;
@@ -201,38 +201,32 @@ app.get("/listProduits/:category?/:subcategory?", function (req, res) {
     }
 
 
-    // Exécution de la requête
-    db.query(sql, params, (err, products) => {
-        if (err) {
-            console.error("Erreur récupération produits:", err);
-            return res.status(500).send("Erreur serveur: produits non disponibles");
-        }
+    // Exécution de la requête avec async/await
+    try {
+        const [products] = await db.query(sql, params);
 
         // Requête pour les bornes min/max du prix
         const prixQuery = `SELECT MIN(prix) AS prixMin, MAX(prix) AS prixMax FROM produit`;
+        const [prixResult] = await db.query(prixQuery);
+        
+        const { prixMin, prixMax } = prixResult[0];
 
-        db.query(prixQuery, (err2, result) => {
-            if (err2) {
-                console.error("Erreur récupération prix min/max:", err2);
-                return res.status(500).send("Erreur serveur: prix non disponibles");
-            }
-
-            const { prixMin, prixMax } = result[0];
-
-            res.render("pages/listProduits", {
-                products,
-                category,
-                subcategory,
-                prixMin,
-                prixMax,
-                prixMinFiltre,
-                prixMaxFiltre,
-                searchQuery,
-                aucunResultat: products.length === 0,
-                taillesFiltre: taillesFiltre ? taillesFiltre.split(",") : []
-            });
+        res.render("pages/listProduits", {
+            products,
+            category,
+            subcategory,
+            prixMin,
+            prixMax,
+            prixMinFiltre,
+            prixMaxFiltre,
+            searchQuery,
+            aucunResultat: products.length === 0,
+            taillesFiltre: taillesFiltre ? taillesFiltre.split(",") : []
         });
-    });
+    } catch (err) {
+        console.error("Erreur récupération produits:", err);
+        return res.status(500).send("Erreur serveur: produits non disponibles");
+    }
 });
 
 
@@ -249,27 +243,28 @@ app.get("/connexion", function (req, res) {
     res.render("pages/connexion");
 });
 
-app.get("/modifier-details", (req, res) => {
+app.get("/modifier-details", async (req, res) => {
     if (!req.session.userId) return res.redirect("/connexion");
 
-    const sql = "SELECT nom, prenom, email FROM utilisateur WHERE id_utilisateur = ?";
-    db.query(sql, [req.session.userId], (err, result) => {
-        if (err) return res.status(500).send("Erreur serveur");
+    try {
+        const sql = "SELECT nom, prenom, email FROM utilisateur WHERE id_utilisateur = ?";
+        const [result] = await db.query(sql, [req.session.userId]);
+        
         if (result.length === 0) return res.redirect("/connexion");
 
         res.render("pages/modifier-details", { user: result[0] });
-    });
+    } catch (err) {
+        console.error("Erreur serveur:", err);
+        return res.status(500).send("Erreur serveur");
+    }
 });
-app.post("/modifier-details", (req, res) => {
+app.post("/modifier-details", async (req, res) => {
     const { prenom, nom, email } = req.body;
     const userId = req.session.userId;
 
-    const sql = "UPDATE utilisateur SET prenom = ?, nom = ?, email = ? WHERE id_utilisateur = ?";
-    db.query(sql, [prenom, nom, email, userId], (err, result) => {
-        if (err) {
-            console.error("Erreur lors de la modification :", err);
-            return res.status(500).send("Erreur serveur");
-        }
+    try {
+        const sql = "UPDATE utilisateur SET prenom = ?, nom = ?, email = ? WHERE id_utilisateur = ?";
+        const [result] = await db.query(sql, [prenom, nom, email, userId]);
 
         // Met à jour la session pour afficher les nouvelles infos
         req.session.user.prenom = prenom;
@@ -277,7 +272,10 @@ app.post("/modifier-details", (req, res) => {
         req.session.user.email = email;
 
         res.redirect("/mon-compte");
-    });
+    } catch (err) {
+        console.error("Erreur lors de la modification :", err);
+        return res.status(500).send("Erreur serveur");
+    }
 });
 
 
@@ -300,22 +298,17 @@ app.post("/password-change", async (req, res) => {
         const hash = await bcrypt.hash(password, 10);
         const sql = "update utilisateur SET mot_de_passe = ? WHERE email = ?";
 
-        db.query(sql, [hash, email], (err, result) => {
-            if (err) {
-                console.error("Erreur lors de la mise à jour du mot de passe :", err);
-                return res.status(500).send("Erreur serveur lors de la modification du mot de passe.");
-            }
+        const [result] = await db.query(sql, [hash, email]);
+        
+        if (result.affectedRows === 0) {
+            return res.send("Aucun utilisateur trouvé avec cet email.")
+        }
 
-            if (result.affectedRows === 0) {
-                return res.send("Aucun utilisateur trouvé avec cet email.")
-            }
-
-            console.log("Mot de passe mis à jour avec succès pour :", email);
-            res.redirect("/connexion"); // Redirection après inscription
-        });
+        console.log("Mot de passe mis à jour avec succès pour :", email);
+        res.redirect("/connexion"); // Redirection après inscription
     } catch (err) {
-        console.error("Erreur bcrypt :", err);
-        res.status(500).send("Erreur serveur.");
+        console.error("Erreur lors de la mise à jour du mot de passe :", err);
+        res.status(500).send("Erreur serveur lors de la modification du mot de passe.");
     }
 });
 
@@ -327,8 +320,6 @@ app.get("/inscription", function (req, res) {
 app.post("/inscription", async (req, res) => {
     const { nom, prenom, email, password, confirm_password } = req.body;
 
-
-
     // Vérification simple du mot de passe
     if (password !== confirm_password) {
         return res.send("Les mots de passe ne correspondent pas !");
@@ -336,56 +327,43 @@ app.post("/inscription", async (req, res) => {
     try {
         // 1. Vérifier si l'email est déjà utilisé
         const checkEmailSql = "SELECT * FROM utilisateur WHERE email = ?";
-        db.query(checkEmailSql, [email], async (err, results) => {
-            if (err) {
-                console.error("Erreur lors de la vérification de l'email :", err);
-                return res.status(500).send("Erreur serveur.");
-            }
+        const [results] = await db.query(checkEmailSql, [email]);
 
-            if (results.length > 0) {
-                return res.render("pages/inscription", {
-                    erreur: "Cet email est déjà utilisé.",
-                    nom,
-                    prenom,
-                    email
-                });
-            }
-
-            // 2. Si email libre, continuer l'inscription
-           const hashedPassword = await bcrypt.hash(password, 10);
-            const insertSql = "INSERT INTO utilisateur (nom, prenom, email, mot_de_passe) VALUES (?, ?, ?, ?)";
-            db.query(insertSql, [nom, prenom, email, hashedPassword], (err, result) => {
-                if (err) {
-                    console.error("Erreur lors de l'insertion :", err);
-                    return res.status(500).send("Erreur serveur lors de l'inscription.");
-                }
-
-                console.log("Utilisateur inscrit avec succès :", result);
-                res.redirect("/connexion");
+        if (results.length > 0) {
+            return res.render("pages/inscription", {
+                erreur: "Cet email est déjà utilisé.",
+                nom,
+                prenom,
+                email
             });
-        });
-        } catch (err) {
-            console.error("Erreur de hachage :", err);
-            res.status(500).send("Erreur serveur.");
         }
-    });
 
-app.post("/connexion", (req, res) => {
+        // 2. Si email libre, continuer l'inscription
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const insertSql = "INSERT INTO utilisateur (nom, prenom, email, mot_de_passe) VALUES (?, ?, ?, ?)";
+        const [result] = await db.query(insertSql, [nom, prenom, email, hashedPassword]);
+
+        console.log("Utilisateur inscrit avec succès :", result);
+        res.redirect("/connexion");
+    } catch (err) {
+        console.error("Erreur lors de l'inscription :", err);
+        res.status(500).send("Erreur serveur.");
+    }
+});
+
+app.post("/connexion", async (req, res) => {
     console.log("Données reçues :", req.body);
     const { email, password } = req.body;
 
-    const sql = "SELECT id_utilisateur, nom, prenom, email, mot_de_passe FROM utilisateur WHERE email = ?";
-
-    db.query(sql, [email], async (err, results) => {
-        if (err) {
-            console.error("Erreur lors de la connexion :", err);
-            return res.status(500).send("Erreur serveur");
-        }
+    try {
+        const sql = "SELECT id_utilisateur, nom, prenom, email, mot_de_passe FROM utilisateur WHERE email = ?";
+        const [results] = await db.query(sql, [email]);
 
         if (results.length === 0) {
             // Si l'email est incorrect
             return res.json({ success: false, message: "Email ou mot de passe incorrect", field: "email" });
         }
+        
         const user = results[0];
         const match = await bcrypt.compare(password, user.mot_de_passe);
 
@@ -402,30 +380,31 @@ app.post("/connexion", (req, res) => {
         delete req.session.isTemporaryUser;
 
         return res.json({ success: true });
-    });
+    } catch (err) {
+        console.error("Erreur lors de la connexion :", err);
+        return res.status(500).send("Erreur serveur");
+    }
 });
 
 // ------------------------------ Page "Mon compte" ------------------------------
-app.get("/mon-compte", (req, res) => {
+app.get("/mon-compte", async (req, res) => {
     if (!req.session.user || req.session.isTemporaryUser) {
-
         return res.redirect("/connexion");
     }
 
-    const sql = "SELECT nom, prenom, email, points FROM utilisateur WHERE id_utilisateur = ?";
-
-    db.query(sql, [req.session.userId], (err, results) => {
-        if (err) {
-            console.error("Erreur lors de la récupération des informations de l'utilisateur :", err);
-            return res.status(500).send("Erreur serveur");
-        }
+    try {
+        const sql = "SELECT nom, prenom, email, points FROM utilisateur WHERE id_utilisateur = ?";
+        const [results] = await db.query(sql, [req.session.userId]);
 
         if (results.length === 0) {
             return res.redirect("/connexion");
         }
 
         res.render("pages/mon-compte", { user: results[0] });
-    });
+    } catch (err) {
+        console.error("Erreur lors de la récupération des informations de l'utilisateur :", err);
+        return res.status(500).send("Erreur serveur");
+    }
 });
 
 // Page historique de commandes
@@ -486,16 +465,10 @@ app.post('/annuler-commande', async (req, res) => {
 })
 
 // Page des produits des points de fidélité
-app.get("/produits-points", (req, res) => {
-    const sql = 'SELECT * FROM produits_points';
-
-    db.query(sql, (err, result) => {
-        if (err) {
-            console.error('Erreur SQL: ', err);
-            return res.status(500).send('Erreur lors de la récupération des produits');
-        }
-
-        const produits = result;
+app.get("/produits-points", async (req, res) => {
+    try {
+        const sql = 'SELECT * FROM produits_points';
+        const [produits] = await db.query(sql);
 
         // Filtrer produits selon catégories de points
         const produits100_300 = produits.filter(p => p.points_requis >= 100 && p.points_requis <= 300);
@@ -503,30 +476,26 @@ app.get("/produits-points", (req, res) => {
         const produits400_600 = produits.filter(p => p.points_requis > 400 && p.points_requis <= 600);
         const produits600_900 = produits.filter(p => p.points_requis > 600 && p.points_requis <= 900);
 
-
         if (req.session.userId) {
             const sqlPoints = 'SELECT points FROM utilisateur WHERE id_utilisateur = ?';
+            const [result2] = await db.query(sqlPoints, [req.session.userId]);
+            
+            const pointsUtilisateur = result2.length > 0 ? result2[0].points : 0;
 
-            db.query(sqlPoints, [req.session.userId], (err2, result2) => {
-                if (err2) {
-                    console.error('Erreur SQL utilisateur.points: ', err2);
-                    return res.status(500).send('Erreur lors de la récupération des points');
-                }
-
-                const pointsUtilisateur = result2.length > 0 ? result2[0].points : 0;
-
-                res.render('pages/produits-points', {
-                    produits100_300,
-                    produits300_400,
-                    produits400_600,
-                    produits600_900,
-                    pointsUtilisateur
-                });
+            res.render('pages/produits-points', {
+                produits100_300,
+                produits300_400,
+                produits400_600,
+                produits600_900,
+                pointsUtilisateur
             });
         } else {
             res.render("pages/connexion");
         }
-    });
+    } catch (err) {
+        console.error('Erreur SQL: ', err);
+        return res.status(500).send('Erreur lors de la récupération des produits');
+    }
 });
 
 
@@ -535,16 +504,17 @@ app.get("/forgot-password", (req, res) => {
     res.render("pages/forgot-password");
 });
 
-app.post("/forgot-password", (req, res) => {
+app.post("/forgot-password", async (req, res) => {
     const { email } = req.body;
 
-    const sql = "SELECT * FROM utilisateur WHERE email = ?";
-    db.query(sql, [email], async (err, result) => {
-        if (err) return res.status(500).send("Erreur serveur");
+    try {
+        const sql = "SELECT * FROM utilisateur WHERE email = ?";
+        const [result] = await db.query(sql, [email]);
+        
         if (result.length === 0) return res.send("Aucun compte trouvé");
 
-        const token = uuidv4();
-        const lien = `http://localhost:4000/password-change?token=${token}&email=${encodeURIComponent(email)}`;
+        const baseUrl = process.env.BASE_URL || 'http://localhost:4000';
+        const lien = `${baseUrl}/password-change?token=${token}&email=${encodeURIComponent(email)}`;
 
         const mailOptions = {
             from: '"Maison Dhalia" <maisondhalia@gmail.com>',
@@ -556,14 +526,19 @@ app.post("/forgot-password", (req, res) => {
                     <p>Si vous n'avez pas demandé cela, ignorez ce message.</p>`
         };
 
-        try {
-            await transporter.sendMail(mailOptions);
-            res.send("Un corriel de réinitialisation a été envoyé !");
-        } catch (err) {
+        await transporter.sendMail(mailOptions);
+        res.send("Un corriel de réinitialisation a été envoyé !");
+    } catch (err) {
+        if (err.code) {
+            // Database error
+            console.error("Erreur base de données:", err);
+            return res.status(500).send("Erreur serveur");
+        } else {
+            // Email error
             console.error("Erreur envoi mail:", err);
             res.status(500).send("Erreur lors de l'envoi du courriel.");
         }
-    });
+    }
 });
 
 // Déconnexion
@@ -1291,8 +1266,8 @@ app.post('/create-checkout-session', async (req, res) => {
                 { shipping_rate: 'shr_1R86rY4ednZ7Sn44wEQEmLTA' },
                 { shipping_rate: 'shr_1R86r54ednZ7Sn44POyvtD3i' }
             ],
-            success_url: 'http://localhost:4000/success?session_id={CHECKOUT_SESSION_ID}',
-            cancel_url: 'http://localhost:4000/panier',
+            success_url: `${process.env.BASE_URL || 'http://localhost:4000'}/success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${process.env.BASE_URL || 'http://localhost:4000'}/panier`,
         });
 
         res.json({ url: session.url });
@@ -1469,7 +1444,7 @@ app.get('/success', async (req, res) => {
             <ul style="list-style: none; padding-left: 0;">
                 ${nouvelleCommande.produits.map(p => `
                     <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                        <img src="http://localhost:4000/${p.image} alt="${p.nom}" width="80" style="margin-right: 15px; border-radius: 10px;">
+                        <img src="${process.env.BASE_URL || 'http://localhost:4000'}/${p.image}" alt="${p.nom}" width="80" style="margin-right: 15px; border-radius: 10px;">
                         <div>
                             <p style="margin: 0; font-weight: bold;">${p.nom}</p>
                             <p style="margin: 0;">Qty: ${p.quantite}</p>
@@ -1583,30 +1558,25 @@ app.get("/conditions", function (req, res) {
 
 // ------------------------------------------ BARRE DE RECHERCHE -----------------------------
 
-app.get("/api/suggestions", (req, res) => {
+app.get("/api/suggestions", async (req, res) => {
     const searchTerm = req.query.query;
 
     if (!searchTerm || searchTerm.trim() === "") {
         return res.json([]);
     }
 
-    const like = `%${searchTerm}%`;
+    try {
+        const like = `%${searchTerm}%`;
 
-    const sql = `
-      SELECT id_produit, nom, type, sous_categorie, genre
-      FROM produit
-      WHERE LOWER(nom) LIKE LOWER(?)
-         OR LOWER(type) LIKE LOWER(?)
-         OR LOWER(sous_categorie) LIKE LOWER(?)
-         OR LOWER(genre) LIKE LOWER(?)
-      LIMIT 15
-    `;
-
-    db.query(sql, [like, like, like, like], (err, results) => {
-        if (err) {
-            console.error("Erreur suggestions AJAX:", err);
-            return res.status(500).json([]);
-        }
+        const sql = `
+          SELECT id_produit, nom, type, sous_categorie, genre
+          FROM produit
+          WHERE LOWER(nom) LIKE LOWER(?)
+             OR LOWER(type) LIKE LOWER(?)
+             OR LOWER(sous_categorie) LIKE LOWER(?)
+             OR LOWER(genre) LIKE LOWER(?)
+          LIMIT 15
+        `;
 
         const suggestions = new Map();
 
@@ -1655,7 +1625,10 @@ app.get("/api/suggestions", (req, res) => {
         });
 
         res.json(Array.from(suggestions.values()));
-    });
+    } catch (err) {
+        console.error("Erreur suggestions AJAX:", err);
+        return res.status(500).json([]);
+    }
 
     function capitalize(str) {
         return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -1753,35 +1726,29 @@ app.get('/api/avis/:produitId', async (req, res) => {
 });
 
 // ------------------------------------------ SECTION POPUP NEWSLETTER ------------------------------------------
-app.post("/newsletter", (req, res) => {
+app.post("/newsletter", async (req, res) => {
     const { email } = req.body;
 
     if (!email) {
         return res.status(400).json({ success: false, message: "Email requis" });
     }
 
-    const checkSql = "SELECT * FROM newsletter WHERE email = ?";
-    db.query(checkSql, [email], (err, results) => {
-        if (err) {
-            console.error("Erreur lors de la vérification d'email:", err);
-            return res.status(500).json({ success: false, message: "Erreur serveur" });
-        }
+    try {
+        const checkSql = "SELECT * FROM newsletter WHERE email = ?";
+        const [results] = await db.query(checkSql, [email]);
 
         if (results.length > 0) {
             return res.status(409).json({ success: false, message: "Vous êtes déjà inscrit à la newsletter." });
         }
 
         const insertSql = "INSERT INTO newsletter (email) VALUES (?)";
+        const [result] = await db.query(insertSql, [email]);
 
-        db.query(insertSql, [email], (err, result) => {
-            if (err) {
-                console.error("Erreur lors de l'insertion dans newsletter: ", err);
-                return res.status(500).json({ success: false, message: "Erreur serveur" });
-            }
-
-            res.json({ success: true });
-        });
-    });
+        res.json({ success: true });
+    } catch (err) {
+        console.error("Erreur lors de l'inscription newsletter:", err);
+        return res.status(500).json({ success: false, message: "Erreur serveur" });
+    }
 });
 
 
@@ -1791,11 +1758,19 @@ async function main() {
         // Connexion MongoDB
         await connectToMongo();
 
-        // note: pas de await pour mysql connexion puisque ça utilise un callback et non des promesses!
+        // MySQL connection is now handled by the pool automatically
 
-        // Lancement du serveur
-        app.listen(4000, () => {
-            console.log("Serveur fonctionne sur http://localhost:4000");
+        // server start
+        const PORT = process.env.PORT || 4000; // let Render assign right port
+
+        // for monitoring and debugging
+        app.get("/health", (req, res) => {
+            res.send("OK");
+        });
+
+        // 0.0.0.0 listens to all network interfaces (not localhost)
+        app.listen(PORT, "0.0.0.0", () => {
+            console.log(`Server is running on port ${PORT}`);
         });
     } catch (err) {
         console.error("Erreur lors de l'initiation du serveur: ", err);

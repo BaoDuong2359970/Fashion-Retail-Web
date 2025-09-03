@@ -3,6 +3,7 @@ Importation des modules requis
 */
 import db from "./models/mysql.js";
 import { connectToMongo, getMongoDB } from "./models/mongodb.js";
+import mongoose from "mongoose";
 import { ObjectId } from "mongodb";
 import express from "express";
 import session from "express-session";
